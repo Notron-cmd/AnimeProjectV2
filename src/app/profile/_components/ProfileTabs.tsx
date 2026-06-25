@@ -1,27 +1,44 @@
 'use client';
 
-import React, { useState } from 'react';
+interface ProfileTabsProps {
+  activeTab: 'overview' | 'library' | 'anime-collection';
+  setActiveTab: (tab: 'overview' | 'library' | 'anime-collection') => void;
+}
 
-export default function ProfileTabs() {
-  const [activeTab, setActiveTab] = useState('Overview');
-  const tabs = ['Overview', 'Favorites', 'Reviews', 'Settings'];
-
+export default function ProfileTabs({ activeTab, setActiveTab }: ProfileTabsProps) {
   return (
-    <div className="flex gap-4 border-b border-[#4a4455]/30 overflow-x-auto pb-2 scrollbar-hide">
-      {tabs.map((tab) => (
-        <button
-          key={tab}
-          onClick={() => setActiveTab(tab)}
-          className={`text-base font-medium pb-2 px-2 whitespace-nowrap transition-all relative cursor-pointer ${
-            activeTab === tab ? 'text-[#d2bbff]' : 'text-[#ccc3d8] hover:text-[#e2e2e6]'
-          }`}
-        >
-          {tab}
-          {activeTab === tab && (
-            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#d2bbff]" />
-          )}
-        </button>
-      ))}
+    <div className="flex gap-2 border-b border-border/60 pb-px overflow-x-auto no-scrollbar">
+      <button
+        onClick={() => setActiveTab('overview')}
+        className={`px-4 py-2 text-sm font-medium border-b-2 transition-all cursor-pointer ${
+          activeTab === 'overview'
+            ? 'border-primary text-primary font-semibold'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        Overview
+      </button>
+
+      <button
+        onClick={() => setActiveTab('library')}
+        className={`px-4 py-2 text-sm font-medium border-b-2 transition-all cursor-pointer ${
+          activeTab === 'library'
+            ? 'border-primary text-primary font-semibold'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        My Library
+      </button>
+      <button
+        onClick={() => setActiveTab('anime-collection')}
+        className={`px-4 py-2 text-sm font-medium border-b-2 transition-all cursor-pointer ${
+          activeTab === 'anime-collection'
+            ? 'border-primary text-primary font-semibold'
+            : 'border-transparent text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        Anime Collection
+      </button>
     </div>
   );
 }

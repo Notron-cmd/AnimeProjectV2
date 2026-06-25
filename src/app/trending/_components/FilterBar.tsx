@@ -56,7 +56,7 @@ export default function FilterBar({ timeframe, setTimeframe, selectedGenre, setS
         </button>
 
         {isGenreOpen && (
-          <div className="absolute right-0 mt-2 w-48 backdrop-blur-lg bg-[#282a2d]/70 border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] py-1.5 z-50 overflow-hidden">
+          <div className="absolute right-0 left-0 mt-2 w-48 backdrop-blur-lg bg-[#282a2d]/70 border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] py-1.5 z-50 overflow-hidden">
             {genres.map((genre) => (
               <button
                 key={genre}
