@@ -29,29 +29,72 @@ export async function POST() {
     const airingData: AiringMedia[] = await getAiringUpdates(anilistIds);
 
     const existingNotifications = await prisma.notification.findMany({
-      where: { userId: currentUser.id, type: 'NEW_EPISODE' },
-      select: { animeId: true, message: true },
+      where: { userId: currentUser.id, type: { in: ['NEW_EPISODE', 'NOW_AIRING', 'COMPLETED'] } },
+      select: { animeId: true, message: true, type: true },
     });
 
-    const existingKeys = new Set(
-      existingNotifications.map((n) => `${n.animeId}|${n.message}`)
+    const existingEpisodeKeys = new Set(
+      existingNotifications
+        .filter((n) => n.type === 'NEW_EPISODE')
+        .map((n) => `${n.animeId}|${n.message}`)
+    );
+
+    const existingNowAiring = new Set(
+      existingNotifications
+        .filter((n) => n.type === 'NOW_AIRING')
+        .map((n) => n.animeId)
+    );
+
+    const existingCompleted = new Set(
+      existingNotifications
+        .filter((n) => n.type === 'COMPLETED')
+        .map((n) => n.animeId)
     );
 
     let created = 0;
 
     for (const media of airingData) {
+      const anime = bookmarks.find((b) => b.anime.anilistId === media.id)?.anime;
+      if (!anime) continue;
+
+      if (media.status === 'RELEASING' && !existingNowAiring.has(anime.id)) {
+        let msg = `${anime.title} is now airing new episodes!`;
+        if (media.nextAiringEpisode?.timeUntilAiring !== undefined && media.nextAiringEpisode.timeUntilAiring <= 3600) {
+          msg = `Episode ${media.nextAiringEpisode.episode} of ${anime.title} is airing now!`;
+        }
+        await prisma.notification.create({
+          data: {
+            userId: currentUser.id,
+            animeId: anime.id,
+            type: 'NOW_AIRING',
+            message: msg,
+          },
+        });
+        created++;
+      }
+
+      if (media.status === 'FINISHED' && !existingCompleted.has(anime.id)) {
+        const epCount = media.episodes ? ` All ${media.episodes} episodes are now available.` : '';
+        await prisma.notification.create({
+          data: {
+            userId: currentUser.id,
+            animeId: anime.id,
+            type: 'COMPLETED',
+            message: `${anime.title} has finished airing!${epCount}`,
+          },
+        });
+        created++;
+      }
+
       if (!media.nextAiringEpisode || media.status !== 'RELEASING') continue;
 
       const airedEpisodes = (media.episodes ?? 0) > 0
         ? (media.episodes as number)
         : media.nextAiringEpisode.episode - 1;
 
-      const anime = bookmarks.find((b) => b.anime.anilistId === media.id)?.anime;
-      if (!anime) continue;
-
       for (let ep = 1; ep <= airedEpisodes; ep++) {
         const key = `${anime.id}|Episode ${ep} of ${anime.title} has aired!`;
-        if (existingKeys.has(key)) continue;
+        if (existingEpisodeKeys.has(key)) continue;
 
         await prisma.notification.create({
           data: {
@@ -64,32 +107,23 @@ export async function POST() {
         created++;
       }
 
-      const nextEpKey = `${anime.id}|Episode ${media.nextAiringEpisode.episode} of ${anime.title} airing soon!`;
-      if (!existingKeys.has(nextEpKey)) {
-        const timeUntilAiring = media.nextAiringEpisode.timeUntilAiring;
+      const timeUntilAiring = media.nextAiringEpisode.timeUntilAiring;
+      const nextEpMsg = timeUntilAiring <= 0
+        ? `Episode ${media.nextAiringEpisode.episode} of ${anime.title} has just aired!`
+        : timeUntilAiring <= 86400
+          ? `Episode ${media.nextAiringEpisode.episode} of ${anime.title} airs in ${Math.ceil(timeUntilAiring / 3600)} hour${Math.ceil(timeUntilAiring / 3600) > 1 ? 's' : ''}!`
+          : null;
 
-        if (timeUntilAiring <= 0) {
-          await prisma.notification.create({
-            data: {
-              userId: currentUser.id,
-              animeId: anime.id,
-              type: 'NEW_EPISODE',
-              message: `Episode ${media.nextAiringEpisode.episode} of ${anime.title} has just aired!`,
-            },
-          });
-          created++;
-        } else if (timeUntilAiring <= 86400) {
-          const hours = Math.ceil(timeUntilAiring / 3600);
-          await prisma.notification.create({
-            data: {
-              userId: currentUser.id,
-              animeId: anime.id,
-              type: 'NEW_EPISODE',
-              message: `Episode ${media.nextAiringEpisode.episode} of ${anime.title} airs in ${hours} hour${hours > 1 ? 's' : ''}!`,
-            },
-          });
-          created++;
-        }
+      if (nextEpMsg && !existingEpisodeKeys.has(`${anime.id}|${nextEpMsg}`)) {
+        await prisma.notification.create({
+          data: {
+            userId: currentUser.id,
+            animeId: anime.id,
+            type: 'NEW_EPISODE',
+            message: nextEpMsg,
+          },
+        });
+        created++;
       }
     }
 
