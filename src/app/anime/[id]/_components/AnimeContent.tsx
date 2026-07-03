@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface ContentProps {
   synopsis: string;
@@ -64,14 +65,14 @@ export default function AnimeContent({ synopsis, trailerThumbnail, characters, r
         </h3>
         <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-none snap-x [&::-webkit-scrollbar]:hidden">
           {recommendations.map((rec) => (
-            <div key={rec.id} className="w-[140px] sm:w-[160px] shrink-0 snap-start group cursor-pointer">
+            <Link href={`/anime/${rec.id}`} key={rec.id} className="w-[140px] sm:w-[160px] shrink-0 snap-start group cursor-pointer">
               <div className="w-full aspect-[2/3] rounded-lg overflow-hidden bg-[#14181d]/60 backdrop-blur-xl border border-[#242b33]/80 mb-2 relative shadow-md group-hover:border-zinc-500 transition-colors">
-                <Image src={rec.img} alt={rec.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={rec.img} alt={rec.title} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
               <span className="block text-xs text-[#e2e2e6] font-medium truncate group-hover:text-[#4cd7f6] transition-colors">
                 {rec.title}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@prisma/client'],
   images: {
     remotePatterns: [
       {
@@ -24,6 +25,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 's4.anilist.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'banner.anilist.co',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

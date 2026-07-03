@@ -1,55 +1,71 @@
 import React from 'react';
-import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { getAnimeDetail } from '@/lib/anilist'; // Pastikan path import mengarah ke file anilist.ts kamu
 import AnimeBanner from '@/src/app/anime/[id]/_components/AnimeBanner';
 import AnimeSidebar from '@/src/app/anime/[id]/_components/AnimeSidebar';
 import AnimeContent from '@/src/app/anime/[id]/_components/AnimeContent';
 
-// MOCK DATA FETCHING
-async function getAnimeFromDatabase(id: string) {
-  if (id === "frieren") {
-    return {
-      title: "Frieren: Beyond Journey's End",
-      title_japanese: '葬送のフリーレン',
-      synopsis: 'The adventure is over but life goes on for an elf mage just beginning to learn what living is all about. Elf mage Frieren and her courageous fellow adventurers have defeated the Demon King and brought peace to the land. But Frieren will long outlive the rest of her former party. How will she come to understand what life means to the people around her? Decades after their victory, the funeral of one her friends confronts Frieren with her own near immortality. Frieren sets out to fulfill the last wishes of her comrades and finds herself beginning a new adventure…',
-      score: 8.9,
-      format: 'TV Series',
-      episodes: 24,
-      status: 'Finished',
-      season: 'Fall 2024',
-      studio: 'MADHOUSE',
-      genres: ['ACTION', 'SCI-FI', 'DRAMA'],
-      image_url: 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154587-qQTzQnEJJ3oB.jpg',
-      trailer_thumbnail: 'https://media.themoviedb.org/t/p/w500_and_h282_face/emGCHnRPru5LLWcKbSFzUEUisac.jpg',
-      characters: [
-        { name: 'Frieren', role: 'MAIN', img: 'https://s4.anilist.co/file/anilistcdn/character/large/b176754-PCnpqIOkjhFk.png' },
-        { name: 'Fern', role: 'MAIN', img: 'https://s4.anilist.co/file/anilistcdn/character/large/b183965-uGFohBjlFoTp.png' },
-        { name: 'Stark', role: 'SUPPORTING', img: 'https://s4.anilist.co/file/anilistcdn/character/large/b184313-CQl6GSt4RSny.jpg' },
-        { name: 'Himmel', role: 'SUPPORTING', img: 'https://s4.anilist.co/file/anilistcdn/character/large/b184311-wQFySqYXEqf1.png' },
-      ],
-      recommendations: [
-        { id: 'iron-genesis', title: 'Iron Genesis', img: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&auto=format&fit=crop&q=80' },
-        { id: 'cyber-frame', title: 'Cyber Frame', img: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80' },
-        { id: 'stellar-transit', title: 'Stellar Transit', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80' },
-        { id: 'aegis-protocol', title: 'Aegis Protocol', img: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&auto=format&fit=crop&q=80' },
-        { id: 'the-monolith', title: 'The Monolith', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&auto=format&fit=crop&q=80' },
-      ]
-    };
-  }
-  return null;
+interface PageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function AnimeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AnimeDetailPage({ params }: PageProps) {
   const { id } = await params; 
   
-  const anime = await getAnimeFromDatabase(id);
+  // Ambil data langsung dari AniList API asli menggunakan ID dari URL rute
+  const animeData = await getAnimeDetail(id);
 
-  if (!anime) {
-    return <div className="text-center py-20 text-zinc-400">Anime Not Found</div>;
+  if (!animeData) {
+    notFound();
   }
+
+  // Rekonstruksi bentuk data agar cocok dan serasi dengan skema props komponen buatanmu
+  const anime = {
+    title: animeData.title.english || animeData.title.romaji,
+    title_japanese: animeData.title.native || "",
+    synopsis: animeData.description ? animeData.description.replace(/<\/?[^>]+(>|$)/g, "") : "No synopsis available.",
+    score: animeData.averageScore ? animeData.averageScore / 10 : 0,
+    format: animeData.format || "TV",
+    episodes: animeData.episodes || 0,
+    status: animeData.status || "UNKNOWN",
+    season: animeData.season ? `${animeData.season} ${animeData.seasonYear}` : `${animeData.seasonYear || 'N/A'}`,
+    studio: animeData.studios?.nodes?.[0]?.name || "Unknown Studio",
+    genres: animeData.genres || [],
+    image_url: animeData.coverImage.extraLarge || animeData.coverImage.large,
+    banner_url: animeData.bannerImage || animeData.coverImage.extraLarge,
+    
+    // Fallback thumbnail jika dari API kosong, ambil dari Unsplash/Image asset
+    trailer_thumbnail: animeData.trailer?.thumbnail || "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800",
+    
+    // Mapping Karakter
+    characters: [
+      ...(animeData.mainCharacters?.edges?.map((edge: any) => ({
+        name: edge.node.name.full,
+        role: edge.role,
+        img: edge.node.image.large
+      })) || []),
+      ...(animeData.supportingCharacters?.edges?.map((edge: any) => ({
+        name: edge.node.name.full,
+        role: edge.role,
+        img: edge.node.image.large
+      })) || [])
+    ],
+
+    // Mapping Rekomendasi
+    recommendations: animeData.recommendations?.nodes
+      ?.filter((node: any) => node.mediaRecommendation !== null)
+      ?.map((node: any) => ({
+        id: node.mediaRecommendation.id.toString(),
+        title: node.mediaRecommendation.title.english || node.mediaRecommendation.title.romaji,
+        img: node.mediaRecommendation.coverImage.large
+      })) || []
+  };
+
   return (
     <div className="bg-[#121317] text-[#e2e2e6] min-h-screen font-sans antialiased pb-24 selection:bg-[#7c3aed] selection:text-white">
       
-      <AnimeBanner src={anime.image_url} alt={anime.title} />
+      {/* Memakai banner_url landscape agar background atas megah */}
+      <AnimeBanner src={anime.banner_url} alt={anime.title} />
 
       <div className="px-4 sm:px-6 md:px-12 lg:px-16 max-w-7xl mx-auto relative z-20 -mt-24 sm:-mt-36 md:-mt-44">
         
@@ -61,7 +77,7 @@ export default async function AnimeDetailPage({ params }: { params: Promise<{ id
 
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
           <AnimeSidebar 
-            title={anime.title} image={anime.image_url} score={anime.score} 
+            anilistId={id} title={anime.title} image={anime.image_url} score={anime.score} 
             format={anime.format} episodes={anime.episodes} status={anime.status} 
             season={anime.season} studio={anime.studio} genres={anime.genres} 
           />

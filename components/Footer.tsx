@@ -37,10 +37,11 @@ export default function Footer() {
               Navigasi
             </h4>
             <ul className="space-y-2.5 text-sm text-zinc-400">
-              <li><a href="#" className="hover:text-[#c3b4fc] transition duration-200">Home</a></li>
-              <li><a href="#" className="hover:text-[#c3b4fc] transition duration-200">Trending Anime</a></li>
-              <li><a href="#" className="hover:text-[#c3b4fc] transition duration-200">Top Rated</a></li>
-              <li><a href="#" className="hover:text-[#c3b4fc] transition duration-200">Jadwal Rilis</a></li>
+              <li><a href="/" className="hover:text-[#c3b4fc] transition duration-200">Home</a></li>
+              <li><a href="/trending" className="hover:text-[#c3b4fc] transition duration-200">Trending Anime</a></li>
+              <li><a href="/rankings" className="hover:text-[#c3b4fc] transition duration-200">Top Rated</a></li>
+              <li><a href="/seasonal" className="hover:text-[#c3b4fc] transition duration-200">Seasonal</a></li>
+              <li><a href="/airing" className="hover:text-[#c3b4fc] transition duration-200">Currently Airing</a></li>
             </ul>
           </div>
 

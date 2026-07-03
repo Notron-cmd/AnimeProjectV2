@@ -1,18 +1,74 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { logoutUser } from '@/src/app/actions/auth';
+import NotificationBell from './NotificationBell';
 
 const Navbar = () => {
-  const pathname = usePathname(); 
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const fetchAvatar = useCallback(() => {
+    fetch('/api/user')
+      .then((res) => {
+        if (!res.ok) {
+          setIsLoggedIn(false);
+          setAvatarUrl(null);
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!data) return;
+        setIsLoggedIn(true);
+        if (data?.user?.avatarUrl) {
+          setAvatarUrl(data.user.avatarUrl);
+        } else {
+          setAvatarUrl(null);
+        }
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setAvatarUrl(null);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchAvatar();
+    window.addEventListener('avatar-updated', fetchAvatar);
+    return () => window.removeEventListener('avatar-updated', fetchAvatar);
+  }, [fetchAvatar]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const logoutRef = useRef<HTMLFormElement>(null);
+
+  function handleLogout() {
+    setProfileOpen(false);
+    logoutRef.current?.requestSubmit();
+  }
 
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Trending', href: '/trending' },
-    { name: 'Top Rated', href: '/top-rated' },
+    { name: 'Top Rated', href: '/rankings' },
+    { name: 'Seasonal', href: '/seasonal' },
+    { name: 'Airing', href: '/airing' },
     { name: 'Search', href: '/explore' },
   ];
 
@@ -48,20 +104,54 @@ const Navbar = () => {
 
       {/* KANAN: Aksi & Tombol Hamburger */}
       <div className="flex items-center space-x-4 md:space-x-5">
-        <button className="text-zinc-400 hover:text-zinc-200 focus:outline-none transition p-1 relative" aria-label="Notifications">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-          </svg>
-        </button>
+        <NotificationBell />
 
-        <Link href="/profile" className="w-9 h-9 rounded-full overflow-hidden border border-zinc-700 cursor-pointer hover:border-purple-400 transition duration-200 relative block">
-          <Image 
-            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=150" 
-            alt="User Avatar" 
-            fill
-            className="object-cover"
-          />
-        </Link>
+        {isLoggedIn ? (
+          <div ref={profileRef} className="relative">
+            <button
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="w-9 h-9 rounded-full overflow-hidden border border-zinc-700 cursor-pointer hover:border-purple-400 transition duration-200 relative block bg-gradient-to-br from-[#7c3aed] to-[#4c1d95] flex items-center justify-center"
+            >
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt="User Avatar" fill className="object-cover" />
+              ) : (
+                <span className="text-xs font-bold text-white">U</span>
+              )}
+            </button>
+            {profileOpen && (
+              <div className="absolute right-0 top-full mt-2 w-40 bg-[#1a1b1e] border border-zinc-700 rounded-xl shadow-2xl overflow-hidden z-50">
+                <Link
+                  href="/profile"
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800/50 transition"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                  Profile
+                </Link>
+                <form ref={logoutRef} action={logoutUser}>
+                  <button
+                    type="submit"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800/50 transition cursor-pointer"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    Logout
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="text-xs font-medium text-zinc-400 hover:text-zinc-200 transition border border-zinc-700 hover:border-purple-400 px-3 py-1.5 rounded-lg"
+          >
+            Login
+          </Link>
+        )}
 
         {/* TOMBOL HAMBURGER MOBILE */}
         <button 

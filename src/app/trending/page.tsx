@@ -1,30 +1,70 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FeaturedCard from './_components/FeaturedCard';
 import FilterBar from './_components/FilterBar';
 import AnimeCard from './_components/AnimeCard';
 import TrendingSidebar from './_components/TrendingSidebar';
+import { getTrendingAnime, getRisingStarsAnime } from '@/lib/anilist';
 
 export default function TrendingPage() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');
   const [selectedGenre, setSelectedGenre] = useState('All Genres');
+  const [animeList, setAnimeList] = useState<any[]>([]);
+  const [risingStars, setRisingStars] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Kumpulan data simulasi/dummy item grid anime
-  const cardData = [
-    { rank: "#2", title: "Cyber Slayers", genre: "Action • Sci-Fi", views: "2.4M", image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=400" },
-    { rank: "#3", title: "Garden of Echoes", genre: "Drama • Mystery", views: "1.9M", image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=400" },
-    { rank: "#4", title: "Void Runners", genre: "Sports • Tech", views: "1.8M", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=400" },
-    { rank: "#5", title: "Eternal Archive", genre: "Fantasy • Magic", views: "1.5M", image: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?q=80&w=400" },
-    { rank: "#6", title: "Neon Pulse", genre: "Music • Slice of Life", views: "1.2M", image: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=400" },
-    { rank: "#7", title: "Binary Hearts", genre: "Romance • Comedy", views: "980K", image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=400" },
-    { rank: "#8", title: "Iron Valkyrie", genre: "Mecha • Military", views: "850K", image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=400" },
-    { rank: "#9", title: "Solar Drift", genre: "Adventure • Space", views: "720K", image: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=400" },
-    { rank: "#10", title: "Grimwire", genre: "Horror • Thriller", views: "650K", image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400" },
-    { rank: "#11", title: "Glitch Kingdom", genre: "Isekai • Adventure", views: "590K", image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=400" },
-    { rank: "#12", title: "Zenith Gate", genre: "Shounen • Action", views: "540K", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400" },
-    { rank: "#13", title: "Midnight Code", genre: "Supernatural", views: "410K", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400" }
-  ];
+  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // Mengambil data awal saat Filter Genre atau Timeframe berubah
+  useEffect(() => {
+    async function fetchInitialData() {
+      setLoading(true);
+      setPage(1); // Reset kembali ke halaman 1
+      try {
+        // Menarik data grid kiri dan data sidebar secara paralel
+        const [trendingData, risingData] = await Promise.all([
+          getTrendingAnime(selectedGenre, timeframe, 1),
+          getRisingStarsAnime()
+        ]);
+        
+        setAnimeList(trendingData || []);
+        setRisingStars(risingData || []);
+      } catch (error) {
+        console.error("Failed to fetch trending data:", error);
+        setAnimeList([]);
+        setRisingStars([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchInitialData();
+  }, [selectedGenre, timeframe]);
+
+  // Fungsi penangan untuk memuat data halaman berikutnya
+  const handleLoadMore = async () => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    
+    try {
+      const newData = await getTrendingAnime(selectedGenre, timeframe, nextPage);
+      if (newData && newData.length > 0) {
+        // Gabungkan data lama dengan data baru yang baru saja ditarik
+        setAnimeList((prevList) => [...prevList, ...newData]);
+        setPage(nextPage);
+      }
+    } catch (error) {
+      console.error("Failed to load more anime:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const featuredAnime = animeList[0];
+  // Grid mengambil seluruh sisa anime dari urutan kedua sampai akhir array
+  const gridAnime = animeList.slice(1);
 
   return (
     <main className="min-h-screen bg-[#0A0C0F] text-[#e2e2e6] pt-24 pb-10 max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12">
@@ -35,18 +75,22 @@ export default function TrendingPage() {
           Trending Now
         </h1>
         <p className="text-base sm:text-lg text-[#ccc3d8] max-w-2xl">
-          Discover the series that are capturing the world's attention this week. Real-time popularity data driven by global engagement.
+          Discover the series that are capturing the world's attention. Real-time popularity data driven by global engagement.
         </p>
       </header>
 
       {/* SEKSI HIGHLIGHT RANK #1 */}
-      <FeaturedCard />
+      {loading ? (
+        <div className="h-[420px] sm:h-[500px] w-full rounded-2xl bg-[#14181d]/40 animate-pulse mb-12 border border-[#242b33]/30" />
+      ) : (
+        featuredAnime && <FeaturedCard anime={featuredAnime} />
+      )}
 
       {/* CORE LAYOUT DENGAN SIDEBAR */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-8 w-full">
         
         {/* KOLOM KIRI: FILTERS & GRID CARDS */}
-        <div className="flex-1">
+        <div className="flex-1 w-full min-w-0">
           <FilterBar 
             timeframe={timeframe} 
             setTimeframe={setTimeframe} 
@@ -54,21 +98,52 @@ export default function TrendingPage() {
             setSelectedGenre={setSelectedGenre} 
           />
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
-            {cardData.map((anime, index) => (
-              <AnimeCard key={index} {...anime} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
+              {[...Array(8)].map((_, idx) => (
+                <div key={idx} className="w-full aspect-[2/3] rounded-xl bg-[#14181d]/40 animate-pulse border border-[#242b33]/20" />
+              ))}
+            </div>
+          ) : gridAnime.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
+                {gridAnime.map((anime, index) => {
+                  const displayTitle = anime.title.english || anime.title.romaji;
+                  const genresFormatted = anime.genres?.slice(0, 2).join(' • ') || 'Anime';
+                  const scoreFormatted = anime.averageScore ? `${anime.averageScore}%` : 'N/A';
 
-          <div className="mt-8 flex justify-center">
-            <button className="px-6 py-3 rounded-xl border border-[#4a4455] text-white hover:bg-[#333538] transition-all text-xs font-bold tracking-wider cursor-pointer active:scale-95">
-              LOAD MORE TRENDING
-            </button>
-          </div>
+                  return (
+                    <AnimeCard 
+                      key={`${anime.id}-${index}`}
+                      id={anime.id.toString()}
+                      rank={`#${index + 2}`}
+                      title={displayTitle}
+                      genre={genresFormatted}
+                      views={scoreFormatted}
+                      image={anime.coverImage.large || anime.coverImage.extraLarge} 
+                    />
+                  );
+                })}
+              </div>
+
+              {/* TOMBOL LOAD MORE DENGAN EVENT CLICK */}
+              <div className="mt-8 flex justify-center">
+                <button 
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-3 rounded-xl border border-[#4a4455] text-white hover:bg-[#333538] transition-all text-xs font-bold tracking-wider cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase"
+                >
+                  {loadingMore ? 'LOADING NEW TRENDING...' : 'LOAD MORE TRENDING'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16 text-zinc-500">No anime found for this genre.</div>
+          )}
         </div>
 
         {/* KOLOM KANAN: SIDEBAR */}
-        <TrendingSidebar />
+        <TrendingSidebar stars={risingStars} loading={loading} />
 
       </div>
     </main>

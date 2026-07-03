@@ -3,22 +3,51 @@
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { registerUser } from '../../actions/auth'; 
 
-export default function LoginPage() {
+export default function RegisterPage() {
   // State untuk efek FILL & warna ikon saat fokus
   const [focusedField, setFocusedField] = useState<string | null>(null);
   
-  // State simulasi submit form
+  // State untuk status submit & pesan error dari database
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmitStatus('submitting');
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setSubmitStatus('submitting');
+  setErrorMessage(null); // Bersihkan error lama
 
-    setTimeout(() => {
-      setSubmitStatus('success');
-    }, 1500);
-  };
+  const formData = new FormData(e.currentTarget);
+
+  try {
+    const result = await registerUser(null, formData);
+    
+    if (result?.error) {
+      setErrorMessage(result.error);
+    } else {
+      // Jika sukses dan ada parameter newUser di URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const newUser = urlParams.get('newUser');
+
+      if (newUser) {
+        setSubmitStatus('success');
+        setErrorMessage("Akun berhasil dibuat. Silakan login.");
+      } else {
+        setSubmitStatus('idle');
+        setErrorMessage("Terjadi kesalahan saat redirect ke halaman login.");
+      }
+    }
+
+  } catch (err) {
+    if (err instanceof Error && 'digest' in err && typeof err.digest === 'string' && err.digest.startsWith('NEXT_REDIRECT')) {
+      return;
+    }
+    setErrorMessage("Terjadi kesalahan koneksi. Silakan coba lagi.");
+  } finally {
+    setSubmitStatus('idle');
+  }
+};
 
   return (
     <div className="min-h-screen flex items-stretch overflow-hidden selection:bg-primary-container/30 bg-background text-on-surface font-sans">
@@ -52,10 +81,10 @@ export default function LoginPage() {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight text-foreground">
-            Welcome Back to the Intelligence Hub.
+            Join the Intelligence Hub.
           </h1>
           <p className="text-base text-on-surface-variant/90 leading-relaxed">
-            Log in to resume your cinematic journey, access custom analytics, and explore neural updates tailored to your identity.
+            Daftar sekarang untuk memulai perjalanan sinematikmu, kelola daftar tontonan anime kustom, dan sinkronisasikan analisismu secara global.
           </p>
           
           <div className="mt-10 grid grid-cols-2 gap-4">
@@ -73,7 +102,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* KANAN: Login Form */}
+      {/* KANAN: Register Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-surface-container/30 p-6 md:p-12 overflow-y-auto">
         <div className="w-full max-w-md space-y-8">
           
@@ -90,11 +119,52 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center lg:text-left">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Access your identity</h2>
-            <p className="text-sm text-on-surface-variant">Enter your credentials to establish connection.</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Create your identity</h2>
+            <p className="text-sm text-on-surface-variant">Enter your details to establish connection.</p>
+            <Link href="/" className="inline-flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors mt-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Back to Home
+            </Link>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Banner Pesan Error dari Database */}
+          {errorMessage && (
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 animate-fadeIn">
+              <span className="material-symbols-outlined text-sm">error</span>
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* 🌟 BARU: Nama Lengkap Field */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block" htmlFor="name">
+                Full Name
+              </label>
+              <div className="relative group">
+                <span 
+                  className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                    focusedField === 'name' ? 'text-primary' : 'text-on-surface-variant/60'
+                  }`}
+                  style={{ fontVariationSettings: focusedField === 'name' ? "'FILL' 1" : "'FILL' 0" }}
+                >
+                  person
+                </span>
+                <input 
+                  className="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant rounded-xl text-base text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200" 
+                  id="name" 
+                  name="name" // Dicocokkan dengan formData.get("name") di Server Action
+                  placeholder="Your complete name" 
+                  type="text" 
+                  onFocus={() => setFocusedField('name')}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                />
+              </div>
+            </div>
+
             {/* Email Field */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block" htmlFor="email">
@@ -149,28 +219,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-start gap-3">
-                <div className="flex items-center h-5">
-                  <input 
-                    className="w-4 h-4 rounded border-outline-variant bg-surface-container-highest text-primary-container focus:ring-primary-container focus:ring-offset-background" 
-                    id="remember" 
-                    type="checkbox"
-                  />
-                </div>
-                <label className="text-xs text-on-surface-variant select-none cursor-pointer" htmlFor="remember">
-                  Remember me
-                </label>
-              </div>
-              <Link className="text-xs text-primary hover:underline transition-all font-medium" href="/forgot-password">
-                Forgot Password?
-              </Link>
-            </div>
-
             {/* Submit Button */}
             <button 
-              className={`w-full py-3 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-150 shadow-md mt-4 active:scale-[0.98] cursor-pointer ${
+              className={`w-full py-3 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all duration-150 shadow-md mt-6 active:scale-[0.98] cursor-pointer ${
                 submitStatus === 'success' 
                   ? 'bg-emerald-600 text-white' 
                   : 'bg-primary-container text-on-primary-container hover:bg-primary-container/90'
@@ -181,19 +232,19 @@ export default function LoginPage() {
               {submitStatus === 'idle' && (
                 <>
                   <span>Create Account</span>
-                  <span className="material-symbols-outlined">login</span>
+                  <span className="material-symbols-outlined">person_add</span>
                 </>
               )}
               {submitStatus === 'submitting' && (
                 <>
                   <span className="material-symbols-outlined animate-spin">sync</span>
-                  <span>Synchronizing...</span>
+                  <span>Creating Identity...</span>
                 </>
               )}
               {submitStatus === 'success' && (
                 <>
                   <span className="material-symbols-outlined">check_circle</span>
-                  <span>Identity Verified</span>
+                  <span>Identity Created</span>
                 </>
               )}
             </button>
@@ -224,7 +275,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Switch To Register */}
+          {/* Switch To Login */}
           <div className="text-center pt-2">
             <p className="text-sm text-on-surface-variant">
               Already Have Account?{' '}

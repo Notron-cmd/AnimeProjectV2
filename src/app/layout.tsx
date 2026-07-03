@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Noto_Sans, Playfair_Display } from "next/font/google
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import { ToastProvider } from "@/components/ui/toast";
 
 const playfairDisplayHeading = Playfair_Display({subsets:['latin'],variable:'--font-heading'});
 const notoSans = Noto_Sans({subsets:['latin'],variable:'--font-sans'});
@@ -42,9 +43,11 @@ export default function RootLayout({
       <body className="bg-[#121317] min-h-full flex flex-col text-foreground">
         
         <LayoutWrapper>
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
+          <ToastProvider>
+            <main className="flex-1 flex flex-col">
+              {children}
+            </main>
+          </ToastProvider>
         </LayoutWrapper>
         
       </body>
