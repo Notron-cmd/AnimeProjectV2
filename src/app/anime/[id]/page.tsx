@@ -34,8 +34,9 @@ export default async function AnimeDetailPage({ params }: PageProps) {
     image_url: animeData.coverImage.extraLarge || animeData.coverImage.large,
     banner_url: animeData.bannerImage || animeData.coverImage.extraLarge,
     
-    // Fallback thumbnail jika dari API kosong, ambil dari Unsplash/Image asset
     trailer_thumbnail: animeData.trailer?.thumbnail || "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800",
+    trailerId: animeData.trailer?.id || null,
+    trailerSite: animeData.trailer?.site || null,
     
     // Mapping Karakter
     characters: [
@@ -92,6 +93,8 @@ export default async function AnimeDetailPage({ params }: PageProps) {
             <AnimeContent 
               synopsis={anime.synopsis} 
               trailerThumbnail={anime.trailer_thumbnail} 
+              trailerId={anime.trailerId}
+              trailerSite={anime.trailerSite}
               characters={anime.characters} 
               recommendations={anime.recommendations} 
             />
