@@ -97,7 +97,7 @@ export default function AnimeSidebar({ anilistId, title, image, score, format, e
     <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-5">
       {/* Poster Card */}
       <div className="relative w-48 sm:w-56 md:w-full aspect-[2/3] rounded-xl overflow-hidden bg-[#14181d]/60 backdrop-blur-xl border border-[#242b33]/80 shadow-[0_8px_32px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:border-[#7c3aed] transition-all duration-300 mx-auto md:mx-0 group">
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image src={image} alt={title} fill sizes="(max-width: 768px) 224px, 280px" className="object-cover" />
       </div>
 
       {/* Quick Actions */}

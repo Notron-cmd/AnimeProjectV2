@@ -20,7 +20,7 @@ export const FilterSection = ({
   selectedFormat,
   onFormatChange,
 }: FilterSectionProps) => {
-  const genres = ["Action", "Sci-Fi", "Drama", "Fantasy", "Comedy", "Adventure", "Romance"];
+  const genres = ["Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror", "Mecha", "Music", "Mystery", "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", "Thriller"];
   const formats = ["All", "TV", "MOVIE", "OVA", "ONA", "SPECIAL"];
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -148,7 +148,7 @@ export const FilterSection = ({
       {/* PANEL MORE FILTERS (Format Dropdown yang Tersembunyi) */}
       {isMoreFiltersOpen && (
         <div className="mt-4 p-4 bg-surface-container-high/30 border border-white/5 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Media Format</h4>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Media Format</h3>
           <div className="flex flex-wrap gap-2">
             {formats.map((fmt) => (
               <button

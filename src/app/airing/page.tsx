@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getCurrentlyAiring } from '@/lib/anilist';
 
 export default function AiringPage() {
@@ -76,10 +77,13 @@ export default function AiringPage() {
               return (
                 <Link key={anime.id} href={`/anime/${anime.id}`} className="group block">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card border border-border/40 group-hover:ring-2 group-hover:ring-primary transition-all duration-300">
-                    <img
+                    <Image
                       src={anime.coverImage?.extraLarge || anime.coverImage?.large}
                       alt={anime.title?.english || anime.title?.romaji}
+                      fill
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
                     />
                     {next && (
                       <div className="absolute top-2 left-2 z-10 px-1.5 py-0.5 rounded bg-emerald-500/90 text-[8px] font-bold text-white uppercase tracking-wider">

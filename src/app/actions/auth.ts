@@ -85,6 +85,10 @@ export async function loginUser(prevState: unknown, formData: FormData) {
       return { error: "Email atau password salah." };
     }
 
+    if (!user.password) {
+      return { error: "Akun ini menggunakan Google Login. Silakan masuk dengan Google." };
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {

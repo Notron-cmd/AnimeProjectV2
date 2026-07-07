@@ -1,12 +1,29 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getAnimeDetail } from '@/lib/anilist'; // Pastikan path import mengarah ke file anilist.ts kamu
+import { getAnimeDetail } from '@/lib/anilist';
 import AnimeBanner from '@/src/app/anime/[id]/_components/AnimeBanner';
 import AnimeSidebar from '@/src/app/anime/[id]/_components/AnimeSidebar';
 import AnimeContent from '@/src/app/anime/[id]/_components/AnimeContent';
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const animeData = await getAnimeDetail(id);
+  if (!animeData) return { title: 'Anime Not Found' };
+  const title = animeData.title.english || animeData.title.romaji;
+  return {
+    title,
+    description: animeData.description?.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 160) || `${title} anime details`,
+    openGraph: {
+      title,
+      description: animeData.description?.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 160),
+      images: [{ url: animeData.coverImage?.extraLarge || animeData.coverImage?.large }],
+    },
+  };
 }
 
 export default async function AnimeDetailPage({ params }: PageProps) {
@@ -71,9 +88,9 @@ export default async function AnimeDetailPage({ params }: PageProps) {
       <div className="px-4 sm:px-6 md:px-12 lg:px-16 max-w-7xl mx-auto relative z-20 -mt-24 sm:-mt-36 md:-mt-44">
         
         {/* 📱 Mobile Title */}
-        <div className="block md:hidden mb-6 text-center px-2">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#e2e2e6] leading-tight">{anime.title}</h1>
-          <h2 className="text-xs sm:text-sm text-zinc-400 font-normal mt-1">{anime.title_japanese}</h2>
+        <div className="block md:hidden mb-6 text-center px-2" aria-hidden="true">
+          <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[#e2e2e6] leading-tight">{anime.title}</p>
+          <p className="text-xs sm:text-sm text-zinc-400 font-normal mt-1">{anime.title_japanese}</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12">

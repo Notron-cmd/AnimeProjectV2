@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface AnimeCardProps {
   anime: {
@@ -29,10 +30,13 @@ export const AnimeCard = ({ anime }: AnimeCardProps) => {
   return (
     <Link href={`/anime/${anime.id}`}>
       <div className="group relative aspect-[2/3] rounded-lg overflow-hidden bg-surface-container cursor-pointer transition-all duration-300 hover:border-primary border border-transparent hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-        <img
+        <Image
           src={anime.coverImage.large || anime.coverImage.extraLarge}
           alt={displayTitle}
+          fill
           className="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10 opacity-90" />
 

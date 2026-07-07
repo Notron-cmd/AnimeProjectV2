@@ -127,7 +127,7 @@ export default function ProfilePage() {
 
       if (res.ok) {
         setBookmarks(prev => prev.filter(b => b.id !== bookmarkItem.id));
-        window.location.reload(); // Refresh halaman agar data favorite terbaru terambil
+        setRefreshKey(k => k + 1);
       }
     } catch (error) {
       console.error(error);
@@ -213,13 +213,13 @@ export default function ProfilePage() {
 
         {activeTab === 'library' && (
           <div className="w-full bg-background border border-border/40 rounded-xl p-6 shadow-sm">
-            <FavoriteLibrary libraryData={formattedLibrary} />
+            <FavoriteLibrary libraryData={formattedLibrary} onRefresh={() => setRefreshKey(k => k + 1)} />
           </div>
         )}
 
         {activeTab === 'anime-collection' && (
           <div className="w-full bg-background border border-border/40 rounded-xl p-6 shadow-sm">
-            <AnimeCollection favorites={favorites} />
+            <AnimeCollection favorites={favorites} onRefresh={() => setRefreshKey(k => k + 1)} />
           </div>
         )}
 

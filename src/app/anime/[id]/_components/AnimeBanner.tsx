@@ -9,6 +9,7 @@ export default function AnimeBanner({ src, alt }: { src: string; alt: string }) 
         src={src} 
         alt={alt} 
         fill
+        sizes="100vw"
         priority
         className="object-cover object-top opacity-50"
       />

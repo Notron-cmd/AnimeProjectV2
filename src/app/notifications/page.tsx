@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useNotifications } from '@/components/notifications/useNotifications';
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -16,47 +17,13 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-type NotificationItem = {
-  id: string;
-  type: string;
-  message: string;
-  read: boolean;
-  createdAt: string;
-  anime: {
-    id: string;
-    anilistId: number;
-    title: string;
-    imageUrl: string;
-  } | null;
-};
-
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { notifications, fetchNotifications, markAllRead } = useNotifications();
+  const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/notifications')
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (cancelled) return;
-        if (data) setNotifications(data.notifications || []);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  async function handleMarkAllRead() {
-    await fetch('/api/notifications', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ all: true }),
-    });
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  }
+  React.useEffect(() => {
+    fetchNotifications().finally(() => setLoading(false));
+  }, [fetchNotifications]);
 
   if (loading) {
     return (
@@ -72,7 +39,7 @@ export default function NotificationsPage() {
         <h1 className="text-2xl font-bold text-zinc-100">Notifications</h1>
         {notifications.some((n) => !n.read) && (
           <button
-            onClick={handleMarkAllRead}
+            onClick={markAllRead}
             className="text-sm text-purple-400 hover:text-purple-300 transition cursor-pointer"
           >
             Mark all as read
@@ -97,7 +64,7 @@ export default function NotificationsPage() {
             >
               {n.anime ? (
                 <Link href={`/anime/${n.anime.anilistId}`} className="w-10 h-14 rounded overflow-hidden shrink-0 bg-zinc-800 relative block">
-                  <Image src={n.anime.imageUrl} alt="" fill className="object-cover" />
+                  <Image src={n.anime.imageUrl} alt={n.anime.title} fill sizes="40px" className="object-cover" />
                 </Link>
               ) : (
                 <div className="w-10 h-14 rounded shrink-0 bg-zinc-800 flex items-center justify-center">

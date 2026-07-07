@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 interface FavoriteAnime {
   id: string;
@@ -36,7 +37,15 @@ export default function FavoriteCollection({ libraryData }: FavoriteCollectionPr
                 key={item.id} 
                 className={`relative aspect-[2/3] rounded-lg overflow-hidden border border-[#4a4455]/30 group cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(124,58,237,0.2)] hover:border-[#7c3aed] bg-[#1e2023] ${visibilityClass}`}
               >
-                <img className="w-full h-full object-cover" src={item.image} alt={item.title} />
+                {item.image ? (
+                  <Image className="w-full h-full object-cover" src={item.image} alt={item.title} fill loading="lazy" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7c3aed]/20 to-[#4c1d95]/20">
+                    <span className="text-3xl font-bold text-[#7c3aed]/40">
+                      {item.title.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 
                 {/* Hover Gradient Text Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C0F]/90 via-transparent to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

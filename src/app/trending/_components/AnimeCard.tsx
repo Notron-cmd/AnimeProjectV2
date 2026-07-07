@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface AnimeCardProps {
   id: string; // Tambahkan properti ID
@@ -19,10 +20,13 @@ export default function AnimeCard({ id, rank, title, genre, views, image }: Anim
       className="group flex flex-col gap-2 p-1 rounded-xl border border-transparent hover:border-[#7c3aed] hover:-translate-y-1 transition-all duration-300 bg-[#121317]/20 cursor-pointer block"
     >
       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-[#1e2023]">
-        <img 
+        <Image 
           src={image} 
           alt={title} 
+          fill
           className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-500"
+          loading="lazy"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
         {/* Badge Rank */}
         <div className="absolute top-2.5 left-2.5 bg-black/70 backdrop-blur-md px-2.5 py-0.5 rounded-lg text-[#d2bbff] font-bold text-xs border border-[#d2bbff]/30">

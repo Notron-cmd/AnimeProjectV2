@@ -108,7 +108,7 @@ export default function Hero({ trendingData }: HeroProps) {
           alt={`Hero Banner ${currentAnime.title?.english || currentAnime.title?.romaji}`}
           fill
           priority
-          unoptimized
+          sizes="100vw"
           className="object-cover object-[50%_30%] opacity-70 transition-all duration-700 ease-in-out" 
         />
       </div>

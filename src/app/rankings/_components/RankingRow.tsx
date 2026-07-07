@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
 
 interface RankingRowProps {
@@ -55,7 +56,7 @@ export default function RankingRow({ rank, anime }: RankingRowProps) {
       </div>
       <Link href={`/anime/${anime.id}`} className="col-span-7 md:col-span-6 flex items-center gap-4">
         <div className="w-12 h-16 rounded overflow-hidden flex-shrink-0 bg-zinc-800">
-          <img className="w-full h-full object-cover" alt={title} src={image} />
+          <Image className="w-full h-full object-cover" alt={title} src={image} fill loading="lazy" sizes="48px" />
         </div>
         <div>
           <h4 className="text-base font-semibold text-white group-hover:text-[#d2bbff] transition-colors line-clamp-1">{title}</h4>

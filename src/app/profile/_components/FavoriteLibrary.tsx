@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
 
 interface LibraryItem {
@@ -20,11 +21,12 @@ interface LibraryItem {
 
 interface FavoriteLibraryProps {
   libraryData: LibraryItem[];
+  onRefresh?: () => void;
 }
 
 const STATUS_OPTIONS = ['Watching', 'Completed', 'Plan to Watch'] as const;
 
-export default function FavoriteLibrary({ libraryData }: FavoriteLibraryProps) {
+export default function FavoriteLibrary({ libraryData, onRefresh }: FavoriteLibraryProps) {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("All");
@@ -61,7 +63,7 @@ export default function FavoriteLibrary({ libraryData }: FavoriteLibraryProps) {
 
       if (res.ok) {
         toast('Status updated!', 'success');
-        window.location.reload();
+        onRefresh?.();
       } else {
         toast('Failed to update status', 'error');
       }
@@ -81,7 +83,7 @@ export default function FavoriteLibrary({ libraryData }: FavoriteLibraryProps) {
       });
       if (res.ok) {
         toast('Episode progress updated!', 'success');
-        window.location.reload();
+        onRefresh?.();
       } else {
         toast('Failed to update progress', 'error');
       }
@@ -107,6 +109,7 @@ export default function FavoriteLibrary({ libraryData }: FavoriteLibraryProps) {
               placeholder="Search library..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search library"
               className="bg-card border border-border rounded-lg pl-9 pr-4 py-1.5 text-xs text-foreground focus:ring-1 focus:ring-ring focus:border-ring outline-none w-full sm:w-44 transition-all"
             />
           </div>
@@ -150,6 +153,7 @@ export default function FavoriteLibrary({ libraryData }: FavoriteLibraryProps) {
               item={anime}
               onStatusChange={handleStatusChange}
               onEpisodeChange={handleEpisodeChange}
+              onRefresh={onRefresh}
             />
           ))}
         </div>
@@ -167,10 +171,12 @@ function StatusCard({
   item,
   onStatusChange,
   onEpisodeChange,
+  onRefresh,
 }: {
   item: LibraryItem;
   onStatusChange: (id: string, status: string) => void;
   onEpisodeChange: (id: string, currentEpisode: number, totalEpisodes?: number) => void;
+  onRefresh?: () => void;
 }) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -184,16 +190,13 @@ function StatusCard({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          anilistId: item.anilistId,
-          title: item.title,
-          imageUrl: item.image,
-          genres: item.genres || [],
+          bookmarkId: item.id,
           actionType: 'remove_bookmark',
         }),
       });
       if (res.ok) {
         toast(`Berhasil menghapus ${item.title} dari bookmark`, 'success');
-        window.location.reload();
+        onRefresh?.();
       } else {
         toast('Gagal menghapus bookmark', 'error');
       }
@@ -208,7 +211,15 @@ function StatusCard({
     <div className="group relative flex flex-col gap-2">
       <Link href={`/anime/${item.anilistId}`}>
         <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card border border-border/40 hover:ring-2 hover:ring-primary transition-all duration-300 shadow-sm cursor-pointer">
-          <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src={item.image} alt={item.title} />
+          {item.image ? (
+            <Image className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src={item.image} alt={item.title} fill loading="lazy" sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7c3aed]/20 to-[#4c1d95]/20">
+              <span className="text-3xl font-bold text-[#7c3aed]/40">
+                {item.title.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
           <button
             onClick={(e) => { e.preventDefault(); handleDelete(); }}
             disabled={deleting}

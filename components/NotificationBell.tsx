@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useNotifications } from '@/components/notifications/useNotifications';
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -16,54 +17,12 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-type NotificationItem = {
-  id: string;
-  type: string;
-  message: string;
-  read: boolean;
-  createdAt: string;
-  anime: {
-    id: string;
-    anilistId: number;
-    title: string;
-    imageUrl: string;
-  } | null;
-};
-
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const fetchedRef = useRef(false);
+  const { notifications, unreadCount, checkForUpdates, fetchNotifications, markAllRead, markRead } = useNotifications();
 
-  const fetchNotifications = useCallback(async () => {
-    try {
-      const res = await fetch('/api/notifications');
-      if (!res.ok) return;
-      const data = await res.json();
-      setNotifications(data.notifications || []);
-      setUnreadCount(data.unreadCount || 0);
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  const checkForUpdates = useCallback(async () => {
-    try {
-      await fetch('/api/notifications/check', { method: 'POST' });
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  useEffect(() => {
+  React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
@@ -80,28 +39,6 @@ export default function NotificationBell() {
       await checkForUpdates();
       await fetchNotifications();
     }
-  };
-
-  const handleMarkAllRead = async () => {
-    await fetch('/api/notifications', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ all: true }),
-    });
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    setUnreadCount(0);
-  };
-
-  const handleMarkRead = async (id: string) => {
-    await fetch('/api/notifications', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids: [id] }),
-    });
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-    setUnreadCount((c) => Math.max(0, c - 1));
   };
 
   return (
@@ -128,7 +65,7 @@ export default function NotificationBell() {
             <div className="flex gap-2">
               {unreadCount > 0 && (
                 <button
-                  onClick={handleMarkAllRead}
+                  onClick={markAllRead}
                   className="text-xs text-purple-400 hover:text-purple-300 transition cursor-pointer"
                 >
                   Mark all read
@@ -154,7 +91,7 @@ export default function NotificationBell() {
                 <button
                   key={n.id}
                   onClick={() => {
-                    if (!n.read) handleMarkRead(n.id);
+                    if (!n.read) markRead(n.id);
                   }}
                   className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-zinc-800/50 transition cursor-pointer border-b border-zinc-800/50 ${
                     !n.read ? 'bg-purple-900/10' : ''
@@ -164,7 +101,7 @@ export default function NotificationBell() {
                     <div className="w-8 h-10 rounded overflow-hidden shrink-0 bg-zinc-800 relative">
                       <Image
                         src={n.anime.imageUrl}
-                        alt=""
+                        alt={n.anime.title}
                         fill
                         className="object-cover"
                       />

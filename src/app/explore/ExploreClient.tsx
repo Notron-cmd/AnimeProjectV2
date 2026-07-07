@@ -32,7 +32,7 @@ const ExploreClient = () => {
       setPage(1);
       
       try {
-        const data = await searchAnime(searchQuery, selectedGenres, selectedFormat, 1);
+        const data = await searchAnime(searchQuery, selectedGenres, selectedFormat, sortBy, 1);
         setAnimeList(data || []);
       } catch (error) {
         console.error("Failed to fetch explore anime:", error);
@@ -47,18 +47,7 @@ const ExploreClient = () => {
     }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, selectedGenres, selectedFormat]); // Memantau perubahan format & array genres
-
-  // Logika Sorting
-  const sortedAnime = [...animeList].sort((a, b) => {
-    if (sortBy === "rating") return (b.averageScore || 0) - (a.averageScore || 0);
-    if (sortBy === "title") {
-      const titleA = a.title.english || a.title.romaji || "";
-      const titleB = b.title.english || b.title.romaji || "";
-      return titleA.localeCompare(titleB);
-    }
-    return b.id - a.id;
-  });
+  }, [searchQuery, selectedGenres, selectedFormat, sortBy]);
 
   const handleLoadMore = async () => {
     if (loadingMore) return;
@@ -66,7 +55,7 @@ const ExploreClient = () => {
     const nextPage = page + 1;
 
     try {
-      const newData = await searchAnime(searchQuery, selectedGenres, selectedFormat, nextPage);
+      const newData = await searchAnime(searchQuery, selectedGenres, selectedFormat, sortBy, nextPage);
       if (newData && newData.length > 0) {
         setAnimeList((prev) => [...prev, ...newData]);
         setPage(nextPage);
@@ -100,7 +89,7 @@ const ExploreClient = () => {
         </section>
       ) : (
         <>
-          <AnimeGrid animes={sortedAnime} />
+          <AnimeGrid animes={animeList} />
           
           {animeList.length >= 24 && (
             <div className="mt-8 flex justify-center">

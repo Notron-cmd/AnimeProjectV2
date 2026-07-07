@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 interface BookmarkItem {
   id: string;
@@ -29,7 +30,15 @@ export default function BookmarkedList({ bookmarks, onDelete, onMoveToLibrary }:
             >
               {/* Mini Square Poster */}
               <div className="w-16 h-16 rounded overflow-hidden shrink-0 bg-[#1e2023]">
-                <img className="w-full h-full object-cover" src={item.image} alt={item.title} />
+                {item.image ? (
+                  <Image className="w-full h-full object-cover" src={item.image} alt={item.title} fill loading="lazy" sizes="64px" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7c3aed]/20 to-[#4c1d95]/20">
+                    <span className="text-lg font-bold text-[#7c3aed]/40">
+                      {item.title.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
               </div>
               
               {/* Titles */}

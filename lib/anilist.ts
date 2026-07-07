@@ -67,7 +67,7 @@ export async function getTrendingAnime(genre?: string, timeframe: 'week' | 'mont
   const query = `
     query ($page: Int ${isFilteringGenre ? ', $genre: String' : ''}) {
       Page(page: $page, perPage: 13) {
-        media(type: ANIME, sort: ${sortString} ${timeFilterString} ${isFilteringGenre ? ', genre: $genre' : ''}, genre_not_in: ["Ecchi", "Hentai"], isAdult: false) {
+        media(type: ANIME, sort: ${sortString} ${timeFilterString} ${isFilteringGenre ? ', genre: $genre' : ''}, genre_not_in: ["Hentai"], isAdult: false) {
           id
           title {
             romaji
@@ -99,34 +99,40 @@ export async function getTrendingAnime(genre?: string, timeframe: 'week' | 'mont
 // 2. Mencari Anime berdasarkan Teks & Genre
 export async function searchAnime(
   searchQuery: string, 
-  genres?: string[], // Ubah menjadi Array
-  format?: string,   // Tambahkan filter format
+  genres?: string[],
+  format?: string,
+  sortBy: string = 'popularity',
   page: number = 1
 ) {
-  // Filter genre valid jika array tidak kosong dan tidak berisi "All" saja
   const validGenres = genres?.filter(g => g !== 'All' && g !== 'All Genres') || [];
   const isFilteringGenre = validGenres.length > 0;
   const hasSearchText = searchQuery && searchQuery.trim() !== '';
   const hasFormat = format && format !== 'All';
 
-  // Buat argumen variabel query secara dinamis
+  const sortMap: Record<string, string> = {
+    popularity: 'POPULARITY_DESC',
+    rating: 'SCORE_DESC',
+    title: 'TITLE_ROMAJI',
+  };
+  const sortString = sortMap[sortBy] || 'POPULARITY_DESC';
+
   const queryArgs = [
     `$page: Int`,
     hasSearchText ? `$search: String` : null,
-    isFilteringGenre ? `$genre: [String]` : null, // Ganti ke [String] untuk array GraphQL
+    isFilteringGenre ? `$genre: [String]` : null,
     hasFormat ? `$format: MediaFormat` : null
   ].filter(Boolean).join(', ');
 
   const query = `
     query (${queryArgs}) {
-      Page(page: $page, perPage: 24) {
+      Page(page: $page, perPage: 50) {
         media(
           type: ANIME, 
-          sort: POPULARITY_DESC
+          sort: ${sortString}
           ${hasSearchText ? ', search: $search' : ''} 
           ${isFilteringGenre ? ', genre_in: $genre' : ''}
           ${hasFormat ? ', format: $format' : ''}
-          genre_not_in: ["Ecchi", "Hentai"], isAdult: false
+          genre_not_in: ["Hentai"], isAdult: false
         ) {
           id
           title {
@@ -233,7 +239,7 @@ export async function getRisingStarsAnime() {
   const query = `
     query {
       Page(page: 1, perPage: 5) {
-        media(type: ANIME, sort: TRENDING_DESC, genre_not_in: ["Ecchi", "Hentai"], isAdult: false) {
+        media(type: ANIME, sort: TRENDING_DESC, genre_not_in: ["Hentai"], isAdult: false) {
           id
           title {
             romaji
@@ -267,7 +273,7 @@ export async function getTopAnime(
   const hasStatus = !!filters?.status && filters.status !== 'All';
 
   const varParts = ['$page: Int', '$perPage: Int'];
-  const filterParts: string[] = ['type: ANIME', 'sort: SCORE_DESC', 'genre_not_in: ["Ecchi", "Hentai"], isAdult: false'];
+  const filterParts: string[] = ['type: ANIME', 'sort: SCORE_DESC', 'genre_not_in: ["Hentai"], isAdult: false'];
 
   if (hasGenre) {
     varParts.push('$genre: String');
@@ -346,7 +352,7 @@ export async function getSeasonalAnime(season: string, year: number, page: numbe
   const query = `
     query ($season: MediaSeason, $year: Int, $page: Int) {
       Page(page: $page, perPage: 24) {
-        media(type: ANIME, season: $season, seasonYear: $year, sort: POPULARITY_DESC, genre_not_in: ["Ecchi", "Hentai"], isAdult: false) {
+        media(type: ANIME, season: $season, seasonYear: $year, sort: POPULARITY_DESC, genre_not_in: ["Hentai"], isAdult: false) {
           id
           title { romaji english }
           averageScore
@@ -367,7 +373,7 @@ export async function getCurrentlyAiring(page: number = 1) {
   const query = `
     query ($page: Int) {
       Page(page: $page, perPage: 24) {
-        media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC, genre_not_in: ["Ecchi", "Hentai"], isAdult: false) {
+        media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC, genre_not_in: ["Hentai"], isAdult: false) {
           id
           title { romaji english }
           averageScore

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface TrendingSidebarProps {
   stars: any[];
@@ -17,12 +18,12 @@ export default function TrendingSidebar({ stars, loading }: TrendingSidebarProps
       
       {/* RISING STARS */}
       <div className="backdrop-blur-md bg-[#14181d]/70 border border-[#242b33]/50 p-5 rounded-2xl">
-        <h4 className="font-bold text-base sm:text-lg mb-4 flex items-center gap-2 text-white">
+        <h2 className="font-bold text-base sm:text-lg mb-4 flex items-center gap-2 text-white">
           <svg className="w-4 h-4 fill-[#4cd7f6] text-[#4cd7f6]" viewBox="0 0 24 24">
             <path d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           Rising Stars
-        </h4>
+        </h2>
         
         <div className="flex flex-col gap-4">
           {loading ? (
@@ -55,16 +56,19 @@ export default function TrendingSidebar({ stars, loading }: TrendingSidebarProps
                   className="flex items-center gap-3 group cursor-pointer block"
                 >
                   <div className="w-14 h-16 rounded-lg bg-[#1e2023] overflow-hidden shrink-0 border border-white/5">
-                    <img 
+                    <Image 
                       src={star.coverImage.medium || star.coverImage.large} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                       alt={displayTitle} 
+                      fill
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                      loading="lazy"
+                      sizes="56px"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h5 className="text-sm font-bold line-clamp-1 group-hover:text-[#4cd7f6] transition-colors">
+                    <h3 className="text-sm font-bold line-clamp-1 group-hover:text-[#4cd7f6] transition-colors">
                       {displayTitle}
-                    </h5>
+                    </h3>
                     
                     <p className="text-[#4cd7f6] text-[11px] font-semibold mt-0.5 flex items-center justify-between">
                       <span className="flex items-center gap-0.5">
@@ -96,7 +100,7 @@ export default function TrendingSidebar({ stars, loading }: TrendingSidebarProps
 
       {/* WEEKLY STATS (Tetap statis seperti desain awalmu) */}
       <div className="backdrop-blur-md bg-[#14181d]/70 border border-[#242b33]/50 p-5 rounded-2xl">
-        <h4 className="font-bold text-base sm:text-lg mb-4 text-white">Weekly Stats</h4>
+        <h2 className="font-bold text-base sm:text-lg mb-4 text-white">Weekly Stats</h2>
         <div className="grid grid-cols-1 gap-3">
           <div className="bg-[#1a1c1f] p-4 rounded-xl border border-[#4a4455]/30">
             <span className="text-[#ccc3d8] text-[10px] font-bold tracking-wider block">ACTIVE VIEWERS</span>
@@ -130,7 +134,7 @@ export default function TrendingSidebar({ stars, loading }: TrendingSidebarProps
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
         <div className="absolute inset-0 bg-[#7c3aed]/10 mix-blend-overlay"></div>
         <div className="absolute bottom-0 p-5 text-center w-full z-10">
-          <h4 className="text-lg font-bold mb-1 text-white">AniVision Plus</h4>
+          <h2 className="text-lg font-bold mb-1 text-white">AniVision Plus</h2>
           <p className="text-xs text-[#ccc3d8] mb-4">Unlock ad-free streaming and exclusive early access.</p>
           <button className="w-full bg-white text-black font-bold text-xs py-2.5 rounded-xl hover:bg-white/95 transition-all shadow-md cursor-pointer active:scale-98">
             UPGRADE NOW

@@ -43,7 +43,7 @@ export default function AnimeContent({ synopsis, trailerThumbnail, trailerId, tr
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-[#14181d]/60 backdrop-blur-xl border border-[#242b33]/80 group cursor-pointer shadow-lg">
-                <Image src={trailerThumbnail} alt="Trailer Thumbnail" fill className="object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300" />
+                <Image src={trailerThumbnail} alt="Trailer Thumbnail" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-14 h-14 rounded-full bg-[#7c3aed]/90 backdrop-blur-md flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <svg className="w-6 h-6 fill-current text-white ml-1" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ export default function AnimeContent({ synopsis, trailerThumbnail, trailerId, tr
           {characters.map((char, index) => (
             <div key={index} className="bg-[#14181d]/60 backdrop-blur-xl rounded-xl overflow-hidden flex flex-col group border border-[#242b33]/80 hover:border-zinc-600 transition-all duration-300 shadow-md">
               <div className="w-full aspect-square overflow-hidden bg-zinc-900 relative">
-                <Image src={char.img} alt={char.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={char.img} alt={char.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="p-3">
                 <span className="block text-xs sm:text-sm font-semibold text-[#e2e2e6] truncate">{char.name}</span>
@@ -102,7 +102,7 @@ export default function AnimeContent({ synopsis, trailerThumbnail, trailerId, tr
           {recommendations.map((rec) => (
             <Link href={`/anime/${rec.id}`} key={rec.id} className="w-[140px] sm:w-[160px] shrink-0 snap-start group cursor-pointer">
               <div className="w-full aspect-[2/3] rounded-lg overflow-hidden bg-[#14181d]/60 backdrop-blur-xl border border-[#242b33]/80 mb-2 relative shadow-md group-hover:border-zinc-500 transition-colors">
-                <Image src={rec.img} alt={rec.title} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={rec.img} alt={rec.title} fill sizes="160px" className="object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
               </div>
               <span className="block text-xs text-[#e2e2e6] font-medium truncate group-hover:text-[#4cd7f6] transition-colors">
                 {rec.title}

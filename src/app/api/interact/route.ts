@@ -20,24 +20,104 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { anilistId, title, imageUrl, genres, actionType, status, totalEpisodes } = body;
+    const { anilistId, title, imageUrl, genres, actionType, status, totalEpisodes, bookmarkId, favoriteId } = body;
+
+    if (!actionType || !VALID_ACTIONS.includes(actionType)) {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    }
+
+    const userId = currentUser.id;
+
+    if (actionType === 'remove_bookmark') {
+      if (bookmarkId && typeof bookmarkId === 'string') {
+        const bookmark = await prisma.bookmark.findUnique({
+          where: { id: bookmarkId },
+          select: { animeId: true, userId: true },
+        });
+        if (!bookmark || bookmark.userId !== userId) {
+          return NextResponse.json({ error: 'Bookmark not found' }, { status: 404 });
+        }
+        await prisma.bookmark.delete({ where: { id: bookmarkId } });
+        await prisma.activityLog.create({
+          data: { userId, action: 'remove_bookmark', animeId: bookmark.animeId },
+        });
+      } else {
+        const cleanAnilistId = validateAnilistId(anilistId);
+        if (!cleanAnilistId) {
+          return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+        const cleanGenres = Array.isArray(genres) ? genres.filter((g): g is string => typeof g === 'string').slice(0, 10) : [];
+        const anime = await prisma.anime.upsert({
+          where: { anilistId: cleanAnilistId },
+          update: {},
+          create: {
+            anilistId: cleanAnilistId,
+            title: (title && typeof title === 'string' ? title.slice(0, 500) : 'Unknown'),
+            imageUrl: imageUrl && typeof imageUrl === 'string' ? imageUrl.slice(0, 1000) : '',
+            genres: cleanGenres,
+          },
+        });
+        await prisma.bookmark.deleteMany({ where: { userId, animeId: anime.id } });
+        if (cleanGenres.length > 0) {
+          for (const genre of cleanGenres) {
+            await prisma.genreStat.updateMany({
+              where: { userId, genre, count: { gt: 0 } },
+              data: { count: { decrement: 1 } },
+            });
+          }
+        }
+        await prisma.activityLog.create({
+          data: { userId, action: 'remove_bookmark', animeId: anime.id },
+        });
+      }
+      return NextResponse.json({ success: true });
+    }
+
+    if (actionType === 'remove_favorite') {
+      if (favoriteId && typeof favoriteId === 'string') {
+        const favorite = await prisma.favorite.findUnique({
+          where: { id: favoriteId },
+          select: { animeId: true, userId: true },
+        });
+        if (!favorite || favorite.userId !== userId) {
+          return NextResponse.json({ error: 'Favorite not found' }, { status: 404 });
+        }
+        await prisma.favorite.delete({ where: { id: favoriteId } });
+        await prisma.activityLog.create({
+          data: { userId, action: 'remove_favorite', animeId: favorite.animeId },
+        });
+      } else {
+        const cleanAnilistId = validateAnilistId(anilistId);
+        if (!cleanAnilistId) {
+          return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+        const cleanGenres = Array.isArray(genres) ? genres.filter((g): g is string => typeof g === 'string').slice(0, 10) : [];
+        const anime = await prisma.anime.upsert({
+          where: { anilistId: cleanAnilistId },
+          update: {},
+          create: {
+            anilistId: cleanAnilistId,
+            title: (title && typeof title === 'string' ? title.slice(0, 500) : 'Unknown'),
+            imageUrl: imageUrl && typeof imageUrl === 'string' ? imageUrl.slice(0, 1000) : '',
+            genres: cleanGenres,
+          },
+        });
+        await prisma.favorite.deleteMany({ where: { userId, animeId: anime.id } });
+        await prisma.activityLog.create({
+          data: { userId, action: 'remove_favorite', animeId: anime.id },
+        });
+      }
+      return NextResponse.json({ success: true });
+    }
 
     const cleanAnilistId = validateAnilistId(anilistId);
     if (!cleanAnilistId || !title || typeof title !== 'string') {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    if (!actionType || !VALID_ACTIONS.includes(actionType)) {
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-    }
-
     const cleanTitle = title.slice(0, 500);
     const cleanImage = imageUrl && typeof imageUrl === 'string' ? imageUrl.slice(0, 1000) : '';
     const cleanGenres = Array.isArray(genres) ? genres.filter((g): g is string => typeof g === 'string').slice(0, 10) : [];
-
-    if (cleanGenres.includes('Ecchi') && (actionType === 'bookmark' || actionType === 'favorite')) {
-      return NextResponse.json({ error: 'Ecchi content is not allowed' }, { status: 400 });
-    }
 
     const cleanTotalEpisodes = typeof totalEpisodes === 'number' && totalEpisodes > 0 ? totalEpisodes : null;
 
@@ -52,8 +132,6 @@ export async function POST(request: Request) {
         totalEpisodes: cleanTotalEpisodes,
       },
     });
-
-    const userId = currentUser.id;
 
     if (actionType === 'bookmark') {
       await prisma.bookmark.upsert({
@@ -84,31 +162,6 @@ export async function POST(request: Request) {
 
       await prisma.activityLog.create({
         data: { userId, action: 'favorite', animeId: anime.id },
-      });
-    } else if (actionType === 'remove_bookmark') {
-      await prisma.bookmark.deleteMany({
-        where: { userId, animeId: anime.id },
-      });
-
-      if (cleanGenres.length > 0) {
-        for (const genre of cleanGenres) {
-          await prisma.genreStat.updateMany({
-            where: { userId, genre, count: { gt: 0 } },
-            data: { count: { decrement: 1 } },
-          });
-        }
-      }
-
-      await prisma.activityLog.create({
-        data: { userId, action: 'remove_bookmark', animeId: anime.id },
-      });
-    } else if (actionType === 'remove_favorite') {
-      await prisma.favorite.deleteMany({
-        where: { userId, animeId: anime.id },
-      });
-
-      await prisma.activityLog.create({
-        data: { userId, action: 'remove_favorite', animeId: anime.id },
       });
     }
 

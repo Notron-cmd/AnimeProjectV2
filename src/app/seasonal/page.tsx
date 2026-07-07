@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getSeasonalAnime } from '@/lib/anilist';
 
 const SEASONS = ['WINTER', 'SPRING', 'SUMMER', 'FALL'] as const;
@@ -105,10 +106,13 @@ export default function SeasonalPage() {
             {animeList.map((anime: any) => (
               <Link key={anime.id} href={`/anime/${anime.id}`} className="group block">
                 <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card border border-border/40 group-hover:ring-2 group-hover:ring-primary transition-all duration-300">
-                  <img
+                  <Image
                     src={anime.coverImage?.extraLarge || anime.coverImage?.large}
                     alt={anime.title?.english || anime.title?.romaji}
+                    fill
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent flex flex-col justify-end p-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="flex items-center gap-1 mb-0.5">

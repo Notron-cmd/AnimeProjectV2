@@ -42,6 +42,7 @@ export default function SearchSection({ currentQuery, currentGenre }: { currentQ
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari anime favoritmu di sini..."
+              aria-label="Search anime"
               className="w-full bg-[#121317] border border-white/10 text-white placeholder-zinc-500 rounded-xl pl-12 pr-4 py-3.5 text-sm sm:text-base focus:outline-none focus:border-[#c3b4fc] focus:ring-1 focus:ring-[#c3b4fc] transition-all duration-200"
             />
           </div>

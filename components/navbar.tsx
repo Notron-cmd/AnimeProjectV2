@@ -110,10 +110,11 @@ const Navbar = () => {
           <div ref={profileRef} className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
+              aria-label="User menu"
               className="w-9 h-9 rounded-full overflow-hidden border border-zinc-700 cursor-pointer hover:border-purple-400 transition duration-200 relative block bg-gradient-to-br from-[#7c3aed] to-[#4c1d95] flex items-center justify-center"
             >
               {avatarUrl ? (
-                <Image src={avatarUrl} alt="User Avatar" fill className="object-cover" />
+                <Image src={avatarUrl} alt="User Avatar" fill sizes="36px" className="object-cover" />
               ) : (
                 <span className="text-xs font-bold text-white">U</span>
               )}

@@ -27,6 +27,7 @@ export const SearchBar = ({ value, onChange }: SearchBarProps) => {
           placeholder="Search anime..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          aria-label="Search anime"
           className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 pl-12 pr-24 text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-lg"
         />
       </div>

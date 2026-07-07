@@ -36,17 +36,12 @@ export async function GET() {
       }
     }
 
-    function isAllowed(anime: typeof animeMap[string] | null | undefined): boolean {
-      if (!anime) return false;
-      return !anime.genres?.includes('Ecchi');
-    }
-
-    const bookmarks = rawBookmarks.filter(b => isAllowed(animeMap[b.animeId])).map(b => ({ ...b, anime: animeMap[b.animeId] }));
-    const favorites = rawFavorites.filter(f => isAllowed(animeMap[f.animeId])).map(f => ({ ...f, anime: animeMap[f.animeId] }));
+    const bookmarks = rawBookmarks.filter(b => animeMap[b.animeId] != null).map(b => ({ ...b, anime: animeMap[b.animeId] }));
+    const favorites = rawFavorites.filter(f => animeMap[f.animeId] != null).map(f => ({ ...f, anime: animeMap[f.animeId] }));
 
     const [genreStats, recentActivities] = await Promise.all([
       prisma.genreStat.findMany({
-        where: { userId: currentUser.id, genre: { not: 'Ecchi' } },
+        where: { userId: currentUser.id },
         orderBy: { count: 'desc' },
       }).catch(e => { console.error('genreStats query failed:', e); return []; }),
       prisma.activityLog.findMany({
@@ -72,10 +67,10 @@ export async function GET() {
 
     const ratingsMap: Record<number, number> = {};
     for (const r of userRatingRows) {
-      if (r.anime && !r.anime.genres?.includes('Ecchi')) ratingsMap[r.anime.anilistId] = r.score;
+      if (r.anime) ratingsMap[r.anime.anilistId] = r.score;
     }
 
-    const safeActivities = recentActivities.filter(a => !a.animeId || (a.anime && !a.anime.genres?.includes('Ecchi')));
+    const safeActivities = recentActivities.filter(a => !a.animeId || a.anime);
 
     return NextResponse.json({
       user: currentUser,

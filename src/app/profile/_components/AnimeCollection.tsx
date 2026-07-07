@@ -2,7 +2,6 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/toast';
 
 interface AnimeData {
@@ -23,9 +22,10 @@ interface FavoriteItem {
 
 interface AnimeCollectionProps {
   favorites: FavoriteItem[];
+  onRefresh?: () => void;
 }
 
-export default function AnimeCollection({ favorites }: AnimeCollectionProps) {
+export default function AnimeCollection({ favorites, onRefresh }: AnimeCollectionProps) {
   const collection = favorites.slice(0, 10);
 
   return (
@@ -46,7 +46,7 @@ export default function AnimeCollection({ favorites }: AnimeCollectionProps) {
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-5">
         {collection.map((fav, index) => (
-          <TiltPosterCard key={fav.id} favorite={fav} rank={index + 1} />
+          <TiltPosterCard key={fav.id} favorite={fav} rank={index + 1} onRefresh={onRefresh} />
         ))}
 
         {collection.length < 10 && (
@@ -73,9 +73,8 @@ export default function AnimeCollection({ favorites }: AnimeCollectionProps) {
   );
 }
 
-function TiltPosterCard({ favorite, rank }: { favorite: FavoriteItem; rank: number }) {
+function TiltPosterCard({ favorite, rank, onRefresh }: { favorite: FavoriteItem; rank: number; onRefresh?: () => void }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const { toast } = useToast();
 
   const handleRemoveFavorite = async (e: React.MouseEvent) => {
@@ -86,17 +85,14 @@ function TiltPosterCard({ favorite, rank }: { favorite: FavoriteItem; rank: numb
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          anilistId: favorite.anime.anilistId,
-          title: favorite.anime.title,
-          imageUrl: favorite.anime.imageUrl,
-          genres: favorite.anime.genres,
+          favoriteId: favorite.id,
           actionType: 'remove_favorite',
         }),
       });
 
       if (res.ok) {
         toast(`Berhasil menghapus ${favorite.anime.title} dari favorit`, 'success');
-        router.refresh();
+        onRefresh?.();
       } else {
         toast('Gagal menghapus dari favorit', 'error');
       }
@@ -137,11 +133,19 @@ function TiltPosterCard({ favorite, rank }: { favorite: FavoriteItem; rank: numb
         style={{ transition: 'transform 0.1s ease-out, border-color 0.3s' }}
         className="relative group aspect-[2/3] rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 shadow-md bg-card cursor-pointer"
       >
-        <img
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-          alt={favorite.anime.title}
-          src={favorite.anime.imageUrl}
-        />
+        {favorite.anime.imageUrl ? (
+          <img
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+            alt={favorite.anime.title}
+            src={favorite.anime.imageUrl}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7c3aed]/20 to-[#4c1d95]/20">
+            <span className="text-4xl font-bold text-[#7c3aed]/40">
+              {favorite.anime.title.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
 
         <div className="absolute top-3 left-3 z-20">
           <div className="bg-background/80 backdrop-blur-md px-2.5 py-0.5 rounded-md border border-border flex items-center gap-1">

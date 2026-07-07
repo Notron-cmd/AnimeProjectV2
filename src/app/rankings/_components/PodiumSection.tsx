@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
 
 interface PodiumSectionProps {
@@ -66,7 +67,7 @@ function PodiumCard({ rank, anime, customClass }: { rank: number; anime: any; cu
     <div className={`bg-[#14181d]/60 backdrop-blur-xl border border-[#242b33]/50 rounded-xl p-6 flex flex-col items-center text-center transition-transform hover:-translate-y-2 duration-300 ${customClass}`}>
       <Link href={`/anime/${anime.id}`} className="block w-full">
         <div className="relative w-full aspect-[2/3] mb-4 rounded-lg overflow-hidden">
-          <img className="w-full h-full object-cover" alt={title} src={image} />
+          <Image alt={title} src={image} fill className="w-full h-full object-cover" loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" />
           <div className={`absolute top-2 left-2 px-4 py-1 rounded-full text-xs font-semibold ${isRank1 ? 'bg-[#7c3aed] text-white shadow-lg' : 'bg-white/20 backdrop-blur-md text-white'}`}>
             #{rank}
           </div>
