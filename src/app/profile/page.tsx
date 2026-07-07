@@ -135,6 +135,26 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDeleteBookmark = async (bookmarkId: string) => {
+    try {
+      const res = await fetchWithCsrf('/api/interact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookmarkId,
+          actionType: 'remove_bookmark',
+        }),
+      });
+
+      if (res.ok) {
+        setBookmarks(prev => prev.filter(b => b.id !== bookmarkId));
+        setRefreshKey(k => k + 1);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (loading) {
     return (
       <main className="flex-grow pt-24 px-4 sm:px-8 max-w-6xl mx-auto w-full pb-12 space-y-6">
@@ -230,7 +250,7 @@ export default function ProfilePage() {
               <FavoriteCollection libraryData={formattedLibrary} />
               <BookmarkedList 
                 bookmarks={formattedBookmarks} 
-                onDelete={() => {}} // Sementara dikosongkan
+                onDelete={handleDeleteBookmark}
                 onMoveToLibrary={(id) => {
                   const target = bookmarks.find(b => b.id === id.toString());
                   if (target) handleMoveToLibrary(target);

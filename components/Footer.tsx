@@ -14,7 +14,7 @@ export default function Footer() {
               AniVision
             </div>
             <p className="text-zinc-400 text-sm leading-relaxed max-w-sm">
-              Platform streaming anime terbaik dengan kualitas HD dan subtitle Indonesia. Tonton anime favoritmu di mana saja dan kapan saja secara gratis tanpa iklan yang mengganggu.
+              AniVision adalah platform pelacak dan penemuan anime gratis. Temukan, tandai, dan kelola tontonan anime favoritmu disini!!
             </p>
             {/* Ikon Sosial Media */}
             <div className="flex items-center space-x-4 pt-2">
@@ -67,7 +67,7 @@ export default function Footer() {
               Pernyataan
             </h4>
             <p className="text-xs text-zinc-500 leading-relaxed mb-3">
-              AniVision tidak menyimpan file apa pun di server kami. Semua konten disediakan oleh pihak ketiga yang tidak berafiliasi.
+              AniVision adalah database dan platform pelacak anime. Kami tidak menyediakan, menyimpan, atau menautkan konten streaming apa pun.
             </p>
             <a href="#" className="text-xs text-[#c3b4fc] hover:underline font-medium">
               DMCA & Hak Cipta

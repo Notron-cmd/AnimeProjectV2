@@ -55,7 +55,7 @@ export default function RankingRow({ rank, anime }: RankingRowProps) {
         <span className="text-xl font-medium text-zinc-400">#{rank}</span>
       </div>
       <Link href={`/anime/${anime.id}`} className="col-span-7 md:col-span-6 flex items-center gap-4">
-        <div className="w-12 h-16 rounded overflow-hidden flex-shrink-0 bg-zinc-800">
+        <div className="relative w-12 h-16 rounded overflow-hidden flex-shrink-0 bg-zinc-800">
           <Image className="w-full h-full object-cover" alt={title} src={image} fill loading="lazy" sizes="48px" />
         </div>
         <div>

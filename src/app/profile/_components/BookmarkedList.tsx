@@ -29,7 +29,7 @@ export default function BookmarkedList({ bookmarks, onDelete, onMoveToLibrary }:
               className="flex items-center gap-4 p-2 rounded-lg hover:bg-[#333538]/30 border border-transparent hover:border-[#4a4455]/30 transition-all cursor-pointer group"
             >
               {/* Mini Square Poster */}
-              <div className="w-16 h-16 rounded overflow-hidden shrink-0 bg-[#1e2023]">
+              <div className="relative w-16 h-16 rounded overflow-hidden shrink-0 bg-[#1e2023]">
                 {item.image ? (
                   <Image className="w-full h-full object-cover" src={item.image} alt={item.title} fill loading="lazy" sizes="64px" />
                 ) : (
