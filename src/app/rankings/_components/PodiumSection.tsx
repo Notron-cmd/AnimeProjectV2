@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
+import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface PodiumSectionProps {
   topThree: any[];
@@ -40,7 +41,7 @@ function PodiumCard({ rank, anime, customClass }: { rank: number; anime: any; cu
     if (adding) return;
     setAdding(true);
     try {
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

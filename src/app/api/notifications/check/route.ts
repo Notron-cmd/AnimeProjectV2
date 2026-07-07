@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const bookmarks = await prisma.bookmark.findMany({
-      where: { userId: currentUser.id, status: 'Watching' },
+      where: { userId: currentUser.id },
       include: { anime: true },
     });
 
