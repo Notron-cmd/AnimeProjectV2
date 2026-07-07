@@ -415,6 +415,52 @@ export async function getAnimeScores(anilistIds: number[]) {
   return scores;
 }
 
+export async function getGenreRecommendations(genres: string[], page: number = 1) {
+  if (!genres.length) return [];
+  const query = `
+    query ($genre: [String], $page: Int) {
+      Page(page: $page, perPage: 12) {
+        media(type: ANIME, genre_in: $genre, sort: POPULARITY_DESC, genre_not_in: ["Hentai"], isAdult: false) {
+          id
+          title { romaji english }
+          coverImage { large extraLarge }
+          averageScore
+          format
+          episodes
+          genres
+        }
+      }
+    }
+  `;
+  const data = await fetchAniList(query, { genre: genres, page });
+  return data?.Page?.media || [];
+}
+
+export async function getScheduleAnime(page: number = 1) {
+  const query = `
+    query ($page: Int) {
+      Page(page: $page, perPage: 50) {
+        media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC, genre_not_in: ["Hentai"], isAdult: false) {
+          id
+          title { romaji english }
+          coverImage { large extraLarge }
+          averageScore
+          format
+          episodes
+          genres
+          nextAiringEpisode {
+            episode
+            airingAt
+            timeUntilAiring
+          }
+        }
+      }
+    }
+  `;
+  const data = await fetchAniList(query, { page });
+  return data?.Page?.media || [];
+}
+
 export type AiringMedia = {
   id: number;
   title: { romaji: string; english: string | null };

@@ -66,6 +66,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Trending', href: '/trending' },
+    { name: 'Schedule', href: '/schedule' },
     { name: 'Top Rated', href: '/rankings' },
     { name: 'Seasonal', href: '/seasonal' },
     { name: 'Airing', href: '/airing' },

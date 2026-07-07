@@ -39,6 +39,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm text-zinc-400">
               <li><a href="/" className="hover:text-[#c3b4fc] transition duration-200">Home</a></li>
               <li><a href="/trending" className="hover:text-[#c3b4fc] transition duration-200">Trending Anime</a></li>
+              <li><a href="/schedule" className="hover:text-[#c3b4fc] transition duration-200">Schedule</a></li>
               <li><a href="/rankings" className="hover:text-[#c3b4fc] transition duration-200">Top Rated</a></li>
               <li><a href="/seasonal" className="hover:text-[#c3b4fc] transition duration-200">Seasonal</a></li>
               <li><a href="/airing" className="hover:text-[#c3b4fc] transition duration-200">Currently Airing</a></li>

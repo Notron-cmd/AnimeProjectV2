@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getAnimeDetail } from '@/lib/anilist';
+import { getAnimeDetail, getGenreRecommendations } from '@/lib/anilist';
 import AnimeBanner from '@/src/app/anime/[id]/_components/AnimeBanner';
 import AnimeSidebar from '@/src/app/anime/[id]/_components/AnimeSidebar';
 import AnimeContent from '@/src/app/anime/[id]/_components/AnimeContent';
@@ -76,8 +76,27 @@ export default async function AnimeDetailPage({ params }: PageProps) {
         id: node.mediaRecommendation.id.toString(),
         title: node.mediaRecommendation.title.english || node.mediaRecommendation.title.romaji,
         img: node.mediaRecommendation.coverImage.large
-      })) || []
+      })) || [],
+
+    // Genre-based recommendations
+    genreRecommendations: [] as Array<{ id: string; title: string; img: string; score: number; format: string; episodes: number }>
   };
+
+  // Fetch genre-based recommendations
+  if (anime.genres.length > 0) {
+    const genreData = await getGenreRecommendations(anime.genres.slice(0, 3));
+    anime.genreRecommendations = (genreData || [])
+      .filter((m: any) => m.id.toString() !== id)
+      .slice(0, 8)
+      .map((m: any) => ({
+        id: m.id.toString(),
+        title: m.title.english || m.title.romaji,
+        img: m.coverImage.large || m.coverImage.extraLarge,
+        score: m.averageScore ? m.averageScore / 10 : 0,
+        format: m.format || 'TV',
+        episodes: m.episodes || 0
+      }));
+  }
 
   return (
     <div className="bg-[#121317] text-[#e2e2e6] min-h-screen font-sans antialiased pb-24 selection:bg-[#7c3aed] selection:text-white">
@@ -114,6 +133,7 @@ export default async function AnimeDetailPage({ params }: PageProps) {
               trailerSite={anime.trailerSite}
               characters={anime.characters} 
               recommendations={anime.recommendations} 
+              genreRecommendations={anime.genreRecommendations}
             />
           </div>
         </div>

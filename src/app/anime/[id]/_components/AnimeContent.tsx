@@ -13,9 +13,10 @@ interface ContentProps {
   trailerSite: string | null;
   characters: Array<{ name: string; role: string; img: string }>;
   recommendations: Array<{ id: string; title: string; img: string }>;
+  genreRecommendations: Array<{ id: string; title: string; img: string; score: number; format: string; episodes: number }>;
 }
 
-export default function AnimeContent({ synopsis, trailerThumbnail, trailerId, trailerSite, characters, recommendations }: ContentProps) {
+export default function AnimeContent({ synopsis, trailerThumbnail, trailerId, trailerSite, characters, recommendations, genreRecommendations }: ContentProps) {
   const [open, setOpen] = useState(false);
 
   const trailerUrl = trailerSite === 'youtube' && trailerId
@@ -111,6 +112,34 @@ export default function AnimeContent({ synopsis, trailerThumbnail, trailerId, tr
           ))}
         </div>
       </section>
+
+      {/* More Like This (Genre-based) */}
+      {genreRecommendations.length > 0 && (
+        <section className="mt-2">
+          <h3 className="text-lg font-bold text-[#e2e2e6] mb-4 flex items-center gap-2">
+            <span className="w-1 h-4 bg-[#4cd7f6] rounded-full inline-block"></span> More Like This
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {genreRecommendations.map((rec) => (
+              <Link href={`/anime/${rec.id}`} key={rec.id} className="group block">
+                <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-[#14181d]/60 backdrop-blur-xl border border-[#242b33]/80 mb-2 shadow-md group-hover:ring-2 group-hover:ring-[#4cd7f6] transition-all duration-300">
+                  <Image src={rec.img} alt={rec.title} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121317] via-[#121317]/20 to-transparent flex flex-col justify-end p-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <span className="text-[#4cd7f6] text-[10px]">★</span>
+                      <span className="text-[10px] font-semibold text-white">{rec.score.toFixed(1)}</span>
+                    </div>
+                    <span className="text-[8px] text-zinc-300">{rec.format} • {rec.episodes} eps</span>
+                  </div>
+                </div>
+                <span className="block text-xs text-[#e2e2e6] font-medium truncate group-hover:text-[#4cd7f6] transition-colors">
+                  {rec.title}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
