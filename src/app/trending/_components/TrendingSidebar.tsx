@@ -55,7 +55,7 @@ export default function TrendingSidebar({ stars, loading }: TrendingSidebarProps
                   href={`/anime/${star.id}`}
                   className="flex items-center gap-3 group cursor-pointer block"
                 >
-                  <div className="w-14 h-16 rounded-lg bg-[#1e2023] overflow-hidden shrink-0 border border-white/5">
+                  <div className="relative w-14 h-16 rounded-lg bg-[#1e2023] overflow-hidden shrink-0 border border-white/5">
                     <Image 
                       src={star.coverImage.medium || star.coverImage.large} 
                       alt={displayTitle} 
