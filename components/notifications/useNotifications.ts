@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { fetchWithCsrf } from '@/lib/csrf-client';
 
 export type NotificationItem = {
   id: string;
@@ -71,7 +72,7 @@ export function useNotifications() {
   }, [fetchNotifications]);
 
   const markAllRead = useCallback(async () => {
-    await fetch('/api/notifications', {
+    await fetchWithCsrf('/api/notifications', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ all: true }),
@@ -81,7 +82,7 @@ export function useNotifications() {
   }, []);
 
   const markRead = useCallback(async (id: string) => {
-    await fetch('/api/notifications', {
+    await fetchWithCsrf('/api/notifications', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: [id] }),
@@ -94,7 +95,7 @@ export function useNotifications() {
 
   const checkForUpdates = useCallback(async () => {
     try {
-      await fetch('/api/notifications/check', { method: 'POST' });
+      await fetchWithCsrf('/api/notifications/check', { method: 'POST' });
     } catch {
       /* ignore */
     }

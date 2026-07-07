@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/toast';
+import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface SidebarProps {
   anilistId: string;
@@ -37,7 +38,7 @@ export default function AnimeSidebar({ anilistId, title, image, score, format, e
   const handleRate = async (newScore: number) => {
     setRatingLoading(true);
     try {
-      const res = await fetch('/api/rating', {
+      const res = await fetchWithCsrf('/api/rating', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ anilistId: parseInt(anilistId), score: newScore }),
@@ -62,7 +63,7 @@ export default function AnimeSidebar({ anilistId, title, image, score, format, e
       };
       if (animeEpisodes > 0) body.totalEpisodes = animeEpisodes;
 
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/src/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateAnilistId } from '@/lib/validation';
+import { validateCsrf } from '@/lib/csrf';
+import { getCached, setCache } from '@/lib/query-cache';
 
 export async function GET(request: Request) {
   try {
@@ -18,7 +20,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ score: null });
     }
 
-    const anime = await prisma.anime.findUnique({ where: { anilistId: cleanId }, select: { id: true } });
+    const cacheKey = `animeIdByAnilist:${cleanId}`;
+    let anime = getCached<{ id: string }>(cacheKey);
+    if (!anime) {
+      anime = await prisma.anime.findUnique({ where: { anilistId: cleanId }, select: { id: true } });
+      if (anime) setCache(cacheKey, anime, 30000);
+    }
     if (!anime) {
       return NextResponse.json({ score: null });
     }
@@ -36,6 +43,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    if (!(await validateCsrf(request))) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -3,12 +3,17 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/src/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
 import { validateAnilistId } from '@/lib/validation';
+import { validateCsrf } from '@/lib/csrf';
 
 const VALID_ACTIONS = ['bookmark', 'favorite', 'remove_bookmark', 'remove_favorite'] as const;
 const VALID_STATUSES = ['Watching', 'Completed', 'Plan to Watch'] as const;
 
 export async function POST(request: Request) {
   try {
+    if (!(await validateCsrf(request))) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -173,6 +178,10 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!(await validateCsrf(request))) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -3,9 +3,14 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/src/lib/auth';
 import { getAiringUpdates, type AiringMedia } from '@/lib/anilist';
 import { rateLimit } from '@/lib/rate-limit';
+import { validateCsrf } from '@/lib/csrf';
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    if (!(await validateCsrf(request))) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

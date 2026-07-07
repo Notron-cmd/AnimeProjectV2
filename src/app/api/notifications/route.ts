@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/src/lib/auth';
 import { rateLimit } from '@/lib/rate-limit';
+import { validateCsrf } from '@/lib/csrf';
 
 export async function GET() {
   try {
@@ -39,6 +40,10 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
+    if (!(await validateCsrf(request))) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

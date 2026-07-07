@@ -9,6 +9,7 @@ import RecentActivity from './_components/RecentActivity';
 import FavoriteCollection from './_components/FavoriteCollection';
 import FavoriteLibrary from './_components/FavoriteLibrary';
 import AnimeCollection from './_components/AnimeCollection';
+import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface AnimeData {
   id: string;
@@ -113,7 +114,7 @@ export default function ProfilePage() {
   // Handler memindahkan bookmark ke library (favorite)
   const handleMoveToLibrary = async (bookmarkItem: BookmarkItem) => {
     try {
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

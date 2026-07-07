@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/toast';
+import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface AnimeData {
   id: string;
@@ -81,7 +82,7 @@ function TiltPosterCard({ favorite, rank, onRefresh }: { favorite: FavoriteItem;
     e.preventDefault();
 
     try {
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

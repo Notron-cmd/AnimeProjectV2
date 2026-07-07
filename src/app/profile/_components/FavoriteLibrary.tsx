@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
+import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface LibraryItem {
   id: string;
@@ -55,7 +56,7 @@ export default function FavoriteLibrary({ libraryData, onRefresh }: FavoriteLibr
 
   const handleStatusChange = async (bookmarkId: string, newStatus: string) => {
     try {
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bookmarkId, status: newStatus }),
@@ -76,7 +77,7 @@ export default function FavoriteLibrary({ libraryData, onRefresh }: FavoriteLibr
     try {
       const body: Record<string, unknown> = { bookmarkId, currentEpisode };
       if (totalEpisodes != null) body.totalEpisodes = totalEpisodes;
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -186,7 +187,7 @@ function StatusCard({
     if (deleting) return;
     setDeleting(true);
     try {
-      const res = await fetch('/api/interact', {
+      const res = await fetchWithCsrf('/api/interact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

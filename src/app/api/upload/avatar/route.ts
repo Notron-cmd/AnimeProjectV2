@@ -4,12 +4,17 @@ import path from 'path';
 import { getCurrentUser } from '@/src/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { rateLimit } from '@/lib/rate-limit';
+import { validateCsrf } from '@/lib/csrf';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 const MAX_SIZE = 2 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {
+    if (!(await validateCsrf(request))) {
+      return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    }
+
     const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
