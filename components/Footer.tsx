@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -37,12 +38,12 @@ export default function Footer() {
               Navigasi
             </h4>
             <ul className="space-y-2.5 text-sm text-zinc-400">
-              <li><a href="/" className="hover:text-[#c3b4fc] transition duration-200">Home</a></li>
-              <li><a href="/trending" className="hover:text-[#c3b4fc] transition duration-200">Trending Anime</a></li>
-              <li><a href="/schedule" className="hover:text-[#c3b4fc] transition duration-200">Schedule</a></li>
-              <li><a href="/rankings" className="hover:text-[#c3b4fc] transition duration-200">Top Rated</a></li>
-              <li><a href="/seasonal" className="hover:text-[#c3b4fc] transition duration-200">Seasonal</a></li>
-              <li><a href="/airing" className="hover:text-[#c3b4fc] transition duration-200">Currently Airing</a></li>
+              <li><Link href="/" className="hover:text-[#c3b4fc] transition duration-200">Home</Link></li>
+              <li><Link href="/trending" className="hover:text-[#c3b4fc] transition duration-200">Trending Anime</Link></li>
+              <li><Link href="/schedule" className="hover:text-[#c3b4fc] transition duration-200">Schedule</Link></li>
+              <li><Link href="/rankings" className="hover:text-[#c3b4fc] transition duration-200">Top Rated</Link></li>
+              <li><Link href="/seasonal" className="hover:text-[#c3b4fc] transition duration-200">Seasonal</Link></li>
+              <li><Link href="/airing" className="hover:text-[#c3b4fc] transition duration-200">Currently Airing</Link></li>
             </ul>
           </div>
 

@@ -6,12 +6,13 @@ import FilterBar from './_components/FilterBar';
 import AnimeCard from './_components/AnimeCard';
 import TrendingSidebar from './_components/TrendingSidebar';
 import { getTrendingAnime, getRisingStarsAnime } from '@/lib/anilist';
+import type { AniListAnime } from "@/lib/types";
 
 export default function TrendingPage() {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'all'>('week');
   const [selectedGenre, setSelectedGenre] = useState('All Genres');
-  const [animeList, setAnimeList] = useState<any[]>([]);
-  const [risingStars, setRisingStars] = useState<any[]>([]);
+  const [animeList, setAnimeList] = useState<AniListAnime[]>([]);
+  const [risingStars, setRisingStars] = useState<AniListAnime[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(1);
@@ -75,7 +76,7 @@ export default function TrendingPage() {
           Trending Now
         </h1>
         <p className="text-base sm:text-lg text-[#ccc3d8] max-w-2xl">
-          Discover the series that are capturing the world's attention. Real-time popularity data driven by global engagement.
+           Discover the series that are capturing the world&apos;s attention. Real-time popularity data driven by global engagement.
         </p>
       </header>
 

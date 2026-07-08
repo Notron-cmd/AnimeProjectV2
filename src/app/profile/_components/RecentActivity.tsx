@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Bookmark, Heart, BookmarkX, Circle } from "lucide-react";
 
 interface ActivityAnime {
   id: string;
@@ -37,19 +38,19 @@ function timeAgo(dateStr: string) {
   return `${months}mo ago`;
 }
 
-const ACTION_CONFIG: Record<string, { icon: string; color: string; label: string }> = {
+const ACTION_CONFIG: Record<string, { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; color: string; label: string }> = {
   bookmark: {
-    icon: 'bookmark',
+    icon: Bookmark,
     color: '#f59e0b',
     label: 'Bookmarked',
   },
   favorite: {
-    icon: 'favorite',
+    icon: Heart,
     color: '#ef4444',
     label: 'Favorited',
   },
   remove_bookmark: {
-    icon: 'bookmark_remove',
+    icon: BookmarkX,
     color: '#958da1',
     label: 'Removed bookmark',
   },
@@ -70,14 +71,12 @@ export default function RecentActivity({ activities }: { activities: ActivityIte
       <h3 className="text-lg font-bold text-[#e2e2e6] mb-4">Recent Activity</h3>
       <div className="space-y-4">
         {activities.map((item) => {
-          const config = ACTION_CONFIG[item.action] || { icon: 'circle', color: '#958da1', label: item.action };
+          const config = ACTION_CONFIG[item.action] || { icon: Circle, color: '#958da1', label: item.action };
           const title = item.anime?.title ?? 'Unknown';
           return (
             <div key={item.id} className="flex gap-3 items-start">
               <div className="mt-0.5 shrink-0" style={{ color: config.color }}>
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {config.icon}
-                </span>
+                <config.icon className="text-[20px]" style={{ fill: config.color }} />
               </div>
               <div>
                 <p className="text-sm text-[#e2e2e6]">

@@ -1,8 +1,9 @@
 import React from "react";
 import { AnimeCard } from "./AnimeCard";
+import type { AniListAnime } from "@/lib/types";
 
 interface AnimeGridProps {
-  animes: any[];
+  animes: AniListAnime[];
 }
 
 export const AnimeGrid = ({ animes }: AnimeGridProps) => {

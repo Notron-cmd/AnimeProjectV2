@@ -4,46 +4,31 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/toast';
+import type { AniListAnime } from "@/lib/types";
 
 interface HeroProps {
-  trendingData: any[];
+  trendingData: AniListAnime[];
 }
 
 export default function Hero({ trendingData }: HeroProps) {
   const { toast } = useToast();
-  // State untuk menyimpan anime aktif yang sedang tampil di Banner
-  const [currentAnime, setCurrentAnime] = useState<any>(null);
+  const [currentAnime, setCurrentAnime] = useState<AniListAnime | null>(null);
 
   useEffect(() => {
-    // 1. Validasi: Jika data dari API belum masuk atau kosong, gunakan fallback data Frieren
     if (!trendingData || trendingData.length === 0) {
-      setCurrentAnime({
-        id: "frieren-fallback",
-        title: { english: "Frieren: Beyond Journey's End", romaji: "Sousou no Frieren" },
-        averageScore: 92,
-        bannerImage: "/assets/Homepage/BackgroundHome.jpg", // Gambar lokal kamu
-        description: "Mage elf Frieren dan rekan-rekan pahlawannya telah berhasil mengalahkan Raja Iblis dan membawa perdamaian ke dunia. Namun, sebagai elf, Frieren ditakdirkan hidup jauh lebih lama daripada teman-temannya.",
-        genres: ["Action", "Fantasy", "Drama"],
-        seasonYear: 2024
-      });
       return;
     }
 
-    // 2. Fungsi untuk memilih 1 anime secara acak dari list trending
-    const setRandomAnime = () => {
-      const randomIndex = Math.floor(Math.random() * trendingData.length);
-      setCurrentAnime(trendingData[randomIndex]);
-    };
+    const randomIndex = Math.floor(Math.random() * trendingData.length);
+    // eslint-disable-next-line react-hooks/set-state-in-effect  
+    setCurrentAnime(trendingData[randomIndex]);
 
-    // Jalankan pengacakan pertama kali saat halaman dimuat
-    setRandomAnime();
-
-    // 3. Set timer untuk mengacak ulang setiap 25 menit
-    // 25 menit = 25 * 60 * 1000 = 1.500.000 ms
     const intervalTime = 25 * 60 * 1000; 
-    const intervalId = setInterval(setRandomAnime, intervalTime);
+    const intervalId = setInterval(() => {
+      const newIndex = Math.floor(Math.random() * trendingData.length);
+      setCurrentAnime(trendingData[newIndex]);
+    }, intervalTime);
 
-    // Bersihkan interval jika komponen tidak lagi digunakan (anti memory leak)
     return () => clearInterval(intervalId);
   }, [trendingData]);
 
@@ -59,9 +44,9 @@ export default function Hero({ trendingData }: HeroProps) {
 
   // Ambil gambar terbaik untuk background. 
   // Catatan: AniList menyediakan properti bannerImage untuk gambar landscape lebar.
-  const backgroundImage = currentAnime.bannerImage || currentAnime.coverImage?.extraLarge || currentAnime.coverImage?.large;
+  const backgroundImage = currentAnime.bannerImage || currentAnime.coverImage.extraLarge || currentAnime.coverImage.large || "";
 
-  const handleBookmarkClick = async (animeFromAniList: any) => {
+  const handleBookmarkClick = async (animeFromAniList: AniListAnime) => {
     try {
       const res = await fetch('/api/interact', {
         method: 'POST',

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { Star } from "lucide-react";
 
 interface FavoriteAnime {
   id: string;
@@ -51,7 +52,7 @@ export default function FavoriteCollection({ libraryData }: FavoriteCollectionPr
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C0F]/90 via-transparent to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <h3 className="text-sm font-semibold text-white truncate">{item.title}</h3>
                   <div className="flex items-center gap-1 text-[#4cd7f6] mt-0.5">
-                    <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    <Star className="text-[14px] fill-[#4cd7f6]" />
                     <span className="text-xs font-semibold tracking-wider">{item.rating}</span>
                   </div>
                 </div>

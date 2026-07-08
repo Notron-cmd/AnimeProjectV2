@@ -1,3 +1,5 @@
+import type { AniListAnime } from "@/lib/types";
+
 const ANILIST_URL = "https://graphql.anilist.co";
 const cache = new Map<string, { data: unknown; expiresAt: number }>();
 
@@ -20,11 +22,12 @@ async function fetchAniList(query: string, variables: object) {
         "Accept": "application/json",
       },
       body: JSON.stringify({ query, variables }),
+      ...(isClient ? {} : { next: { revalidate: 300 } }),
     });
 
     const json = await res.json();
     if (json.errors) {
-      const msg = json.errors.map((e: any) => e.message).join('; ');
+      const msg = json.errors.map((e: { message: string }) => e.message).join('; ');
       throw new Error(`AniList error: ${msg}`);
     }
     if (!res.ok) throw new Error(`AniList HTTP ${res.status}`);
@@ -89,7 +92,7 @@ export async function getTrendingAnime(genre?: string, timeframe: 'week' | 'mont
     }
   `;
   
-  const variables: any = { page };
+  const variables: Record<string, unknown> = { page };
   if (isFilteringGenre) variables.genre = genre;
   
   const data = await fetchAniList(query, variables);
@@ -103,7 +106,7 @@ export async function searchAnime(
   format?: string,
   sortBy: string = 'popularity',
   page: number = 1
-) {
+): Promise<AniListAnime[]> {
   const validGenres = genres?.filter(g => g !== 'All' && g !== 'All Genres') || [];
   const isFilteringGenre = validGenres.length > 0;
   const hasSearchText = searchQuery && searchQuery.trim() !== '';
@@ -151,7 +154,7 @@ export async function searchAnime(
     }
   `;
   
-  const variables: any = { page };
+  const variables: Record<string, unknown> = { page };
   if (hasSearchText) variables.search = searchQuery;
   if (isFilteringGenre) variables.genre = validGenres;
   if (hasFormat) variables.format = format;
@@ -162,7 +165,10 @@ export async function searchAnime(
 
 
 
-export async function getAnimeDetail(id: string) {
+
+
+
+export async function getAnimeDetail(id: string): Promise<AniListAnime | null> {
   const query = `
     query ($id: Int) {
       Media(id: $id, type: ANIME) {

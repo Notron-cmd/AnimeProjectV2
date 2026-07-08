@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import type { AniListAnime } from "@/lib/types";
 
 interface FeaturedCardProps {
-  anime: any;
+  anime: AniListAnime;
 }
 
 export default function FeaturedCard({ anime }: FeaturedCardProps) {

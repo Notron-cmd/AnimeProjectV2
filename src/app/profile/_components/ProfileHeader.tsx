@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import Image from 'next/image';
+import { Pencil, Share2 } from "lucide-react";
 import { useToast } from '@/components/ui/toast';
 
 export interface ProfileUser {
@@ -101,7 +102,7 @@ export default function ProfileHeader({ user, onAvatarChange }: ProfileHeaderPro
           onClick={() => fileInputRef.current?.click()}
           className="absolute -bottom-1 -right-1 bg-[#7c3aed] text-white p-1.5 rounded-full border-2 border-[#1e2023] hover:bg-[#6d28d9] transition-colors cursor-pointer"
         >
-          <span className="material-symbols-outlined text-sm">edit</span>
+          <Pencil className="text-sm" />
         </button>
         <input
           ref={fileInputRef}
@@ -128,10 +129,10 @@ export default function ProfileHeader({ user, onAvatarChange }: ProfileHeaderPro
       {/* Action Buttons */}
       <div className="relative z-10 flex gap-3 mt-4 md:mt-0 self-center md:self-start">
         <button className="bg-[#282a2d] border border-[#958da1] text-[#e2e2e6] hover:bg-[#333538] transition-colors px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 cursor-pointer">
-          <span className="material-symbols-outlined text-[18px]"></span> Share
+          <Share2 className="text-[18px]" /> Share
         </button>
         <button onClick={() => fileInputRef.current?.click()} className="bg-[#7c3aed] text-white hover:opacity-90 transition-opacity px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 cursor-pointer">
-          <span className="material-symbols-outlined text-[18px]"></span> Edit Profile
+          <Pencil className="text-[18px]" /> Edit Profile
         </button>
       </div>
     </header>

@@ -3,9 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { AniListAnime } from "@/lib/types";
 
 interface TrendingSidebarProps {
-  stars: any[];
+  stars: AniListAnime[];
   loading: boolean;
 }
 
@@ -42,12 +43,12 @@ export default function TrendingSidebar({ stars, loading }: TrendingSidebarProps
               const displayTitle = star.title.english || star.title.romaji;
               
               // Hitung persentase bar secara dinamis berdasarkan skor tren dibanding skor tertinggi
-              const barWidth = Math.min(Math.max((star.trending / maxTrendingScore) * 100, 15), 100);
+              const barWidth = Math.min(Math.max(((star.trending ?? 0) / maxTrendingScore) * 100, 15), 100);
               
               // Format angka popularitas besar (misal 150000 -> 150K)
-              const totalFans = star.popularity >= 1000 
-                ? `${(star.popularity / 1000).toFixed(0)}K fans` 
-                : `${star.popularity} fans`;
+              const totalFans = (star.popularity ?? 0) >= 1000 
+                ? `${((star.popularity ?? 0) / 1000).toFixed(0)}K fans` 
+                : `${star.popularity ?? 0} fans`;
 
               return (
                 <Link 

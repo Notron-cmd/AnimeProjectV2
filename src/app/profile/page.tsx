@@ -81,7 +81,7 @@ export default function ProfilePage() {
   const [authError, setAuthError] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [scores, setScores] = useState<Record<number, number>>({});
-  const [userRatings, setUserRatings] = useState<Record<number, number>>({});
+  const [_userRatings, _setUserRatings] = useState<Record<number, number>>({});
 
   // Ambil data profile dari API saat halaman dibuka
   useEffect(() => {
@@ -101,7 +101,7 @@ export default function ProfilePage() {
         setGenreStats(data.genreStats || []);
         setRecentActivities(data.recentActivities || []);
         setScores(data.scores || {});
-        setUserRatings(data.userRatings || {});
+        _setUserRatings(data.userRatings || {});
       } catch (error) {
         console.error('Error fetching profile:', error);
       } finally {

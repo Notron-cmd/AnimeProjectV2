@@ -21,7 +21,7 @@ const ToastContext = createContext<ToastContextValue | null>(null)
 export function useToast() {
   const ctx = useContext(ToastContext)
   if (!ctx) {
-    return { toast: (message: string, type?: ToastType) => {} }
+    return { toast: (_message: string, _type?: ToastType) => {} }
   }
   return ctx
 }

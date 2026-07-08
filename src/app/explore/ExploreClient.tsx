@@ -5,13 +5,14 @@ import { SearchBar } from "./_components/SearchBar";
 import { FilterSection } from "./_components/FilterSection"; 
 import { AnimeGrid } from "./_components/AnimeGrid";
 import { searchAnime } from "@/lib/anilist";
+import type { AniListAnime } from "@/lib/types";
 
 const ExploreClient = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]); // Array State
   const [selectedFormat, setSelectedFormat] = useState("All");
   const [sortBy, setSortBy] = useState("popularity");
-  const [animeList, setAnimeList] = useState<any[]>([]);
+  const [animeList, setAnimeList] = useState<AniListAnime[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [page, setPage] = useState(1);

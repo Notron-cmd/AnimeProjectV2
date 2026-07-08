@@ -4,10 +4,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PodiumSection from './_components/PodiumSection';
 import FilterSection from './_components/FilterSection';
 import RankingRow from './_components/RankingRow';
+import { ChevronDown } from "lucide-react";
 import { getTopAnime } from '@/lib/anilist';
+import type { AniListAnime } from "@/lib/types";
 
 export default function RankingsClient() {
-  const [animeList, setAnimeList] = useState<any[]>([]);
+  const [animeList, setAnimeList] = useState<AniListAnime[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -43,6 +45,7 @@ export default function RankingsClient() {
   }, [genre, year, status]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchRankings(1, false);
   }, [fetchRankings]);
 
@@ -142,7 +145,7 @@ export default function RankingsClient() {
                 className="flex items-center gap-2 px-8 py-3 rounded-xl bg-[#282a2d] border border-[#4a4455]/30 text-xs font-semibold tracking-wide text-white hover:bg-[#37393d] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingMore ? "Loading More..." : "Load More Results"}
-                <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                <ChevronDown className="text-[18px]" />
               </button>
             </div>
           </section>

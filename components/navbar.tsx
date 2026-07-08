@@ -4,8 +4,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { Menu, X, User, LogOut } from "lucide-react";
 import { logoutUser } from '@/src/app/actions/auth';
-import NotificationBell from './NotificationBell';
+import dynamic from "next/dynamic";
+
+const NotificationBell = dynamic(() => import('./NotificationBell'), { ssr: false });
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -57,11 +60,6 @@ const Navbar = () => {
   }, []);
 
   const logoutRef = useRef<HTMLFormElement>(null);
-
-  function handleLogout() {
-    setProfileOpen(false);
-    logoutRef.current?.requestSubmit();
-  }
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -127,9 +125,7 @@ const Navbar = () => {
                   onClick={() => setProfileOpen(false)}
                   className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800/50 transition"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                  </svg>
+                  <User className="w-4 h-4" />
                   Profile
                 </Link>
                 <form ref={logoutRef} action={logoutUser}>
@@ -137,9 +133,7 @@ const Navbar = () => {
                     type="submit"
                     className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800/50 transition cursor-pointer"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                    </svg>
+                    <LogOut className="w-4 h-4" />
                     Logout
                   </button>
                 </form>
@@ -162,9 +156,7 @@ const Navbar = () => {
           aria-label="Toggle Menu"
         >
           {/* Ikon ditambahkan sedikit efek rotasi ketika status berubah */}
-          <span className={`material-symbols-outlined text-[28px] transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}>
-            {isOpen ? 'close' : 'menu'}
-          </span>
+          {isOpen ? <X className="text-[28px] transition-transform duration-300 rotate-90" /> : <Menu className="text-[28px] transition-transform duration-300 rotate-0" />}
         </button>
       </div>
 

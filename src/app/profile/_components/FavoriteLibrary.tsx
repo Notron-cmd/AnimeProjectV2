@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
+import { Search, ChevronDown, FolderOpen, Trash2, Star, Minus, Plus, RefreshCw } from "lucide-react";
 import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface LibraryItem {
@@ -104,7 +105,7 @@ export default function FavoriteLibrary({ libraryData, onRefresh }: FavoriteLibr
 
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex items-center">
-            <span className="material-symbols-outlined absolute left-3 text-muted-foreground text-lg">search</span>
+            <Search className="absolute left-3 text-muted-foreground text-lg" />
             <input
               type="text"
               placeholder="Search library..."
@@ -125,7 +126,7 @@ export default function FavoriteLibrary({ libraryData, onRefresh }: FavoriteLibr
               <option>Score (Highest)</option>
               <option>Alphabetical (A-Z)</option>
             </select>
-            <span className="material-symbols-outlined absolute right-2 pointer-events-none text-muted-foreground text-lg">expand_more</span>
+            <ChevronDown className="absolute right-2 pointer-events-none text-muted-foreground text-lg" />
           </div>
         </div>
       </div>
@@ -160,7 +161,7 @@ export default function FavoriteLibrary({ libraryData, onRefresh }: FavoriteLibr
         </div>
       ) : (
         <div className="text-center py-12">
-          <span className="material-symbols-outlined text-3xl text-muted-foreground/30 mb-1">folder_open</span>
+          <FolderOpen className="text-3xl text-muted-foreground/30 mb-1" />
           <p className="text-xs text-muted-foreground">No anime found in this filter.</p>
         </div>
       )}
@@ -226,11 +227,11 @@ function StatusCard({
             disabled={deleting}
             className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/80 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm text-white">{deleting ? 'sync' : 'delete'}</span>
+            {deleting ? <RefreshCw className="text-sm text-white animate-spin" /> : <Trash2 className="text-sm text-white" />}
           </button>
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="flex items-center gap-1 mb-0.5">
-              <span className="material-symbols-outlined text-amber-400 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+              <Star className="text-amber-400 text-sm fill-amber-400" />
               <span className="text-xs font-semibold text-foreground">{item.rating}</span>
             </div>
             <div className="flex items-center gap-1 mt-0.5">
@@ -238,14 +239,14 @@ function StatusCard({
                 onClick={(e) => { e.preventDefault(); onEpisodeChange(item.id, Math.max(0, item.currentEpisode - 1)); }}
                 className="w-5 h-5 rounded bg-black/50 flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[10px] text-white">remove</span>
+                <Minus className="text-[10px] text-white" />
               </button>
               <span className="text-[9px] font-bold text-primary tabular-nums">{item.episodeProgress}</span>
               <button
                 onClick={(e) => { e.preventDefault(); onEpisodeChange(item.id, (item.currentEpisode ?? 0) + 1, item.totalEpisodes ?? undefined); }}
                 className="w-5 h-5 rounded bg-black/50 flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[10px] text-white">add</span>
+                <Plus className="text-[10px] text-white" />
               </button>
             </div>
           </div>
@@ -263,7 +264,7 @@ function StatusCard({
             className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer flex items-center gap-0.5"
           >
             {item.status}
-            <span className="material-symbols-outlined text-[10px]">expand_more</span>
+            <ChevronDown className="text-[10px]" />
           </button>
 
           {open && (

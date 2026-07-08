@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useRef, useState, FormEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Eye, EyeOff, Mail, Lock, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { loginUser } from "@/src/app/actions/auth";
 
 function LoginForm() {
@@ -17,6 +18,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (searchParams.get("newUser")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSuccessMessage("Akun berhasil dibuat! Silakan masukkan password untuk masuk.");
     }
   }, [searchParams]);
@@ -76,9 +78,7 @@ function LoginForm() {
         
         <div className="relative z-20 p-10 max-w-2xl mb-10">
           <div className="flex items-center gap-3 mb-4 group">
-            <span className="material-symbols-outlined text-primary text-3xl font-bold">
-              visibility
-            </span>
+            <Eye className="text-primary text-3xl font-bold" />
             <h1 className="text-3xl font-bold tracking-tight text-foreground">AniVision</h1>
           </div>
           <h2 className="text-4xl font-extrabold tracking-tight text-foreground mb-3">Your Window Into Infinite Worlds.</h2>
@@ -94,9 +94,7 @@ function LoginForm() {
           
           <div className="text-center md:text-left">
             <div className="md:hidden flex items-center justify-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-primary text-3xl">
-                visibility
-              </span>
+              <Eye className="text-primary text-3xl" />
               <span className="text-2xl font-bold text-foreground">AniVision</span>
             </div>
             <h3 className="text-2xl font-bold tracking-tight text-foreground mb-1">Welcome Back</h3>
@@ -112,7 +110,7 @@ function LoginForm() {
           {/* Banner Pesan Sukses Registrasi Akun Baru */}
           {successMessage && (
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm flex items-center gap-2 animate-fadeIn">
-              <span className="material-symbols-outlined text-sm">check_circle</span>
+              <CheckCircle className="text-sm" />
               <span>{successMessage}</span>
             </div>
           )}
@@ -120,7 +118,7 @@ function LoginForm() {
           {/* Banner Pesan Error Gagal Login */}
           {errorMessage && (
             <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 animate-fadeIn">
-              <span className="material-symbols-outlined text-sm">error</span>
+              <AlertCircle className="text-sm" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -134,9 +132,7 @@ function LoginForm() {
                 Email Address
               </label>
               <div className="relative group rounded-lg border border-input bg-card transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-ring">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors text-xl">
-                  mail
-                </span>
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors text-xl" />
                 <input 
                   className="w-full bg-transparent py-2.5 pl-10 pr-4 text-foreground border-none focus:ring-0 placeholder:text-muted-foreground/40 text-sm outline-none" 
                   id="email" 
@@ -159,9 +155,7 @@ function LoginForm() {
                 </Link>
               </div>
               <div className="relative group rounded-lg border border-input bg-card transition-all focus-within:ring-1 focus-within:ring-ring focus-within:border-ring">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors text-xl">
-                  lock
-                </span>
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors text-xl" />
                 <input 
                   className="w-full bg-transparent py-2.5 pl-10 pr-10 text-foreground border-none focus:ring-0 placeholder:text-muted-foreground/40 text-sm outline-none" 
                   id="password" 
@@ -175,9 +169,7 @@ function LoginForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  <span className="material-symbols-outlined text-xl">
-                    {showPassword ? "visibility_off" : "visibility"}
-                  </span>
+                  {showPassword ? <EyeOff className="text-xl" /> : <Eye className="text-xl" />}
                 </button>
               </div>
             </div>
@@ -190,7 +182,7 @@ function LoginForm() {
             >
               {submitStatus === 'submitting' ? (
                 <>
-                  <span className="material-symbols-outlined animate-spin text-sm">sync</span>
+                  <RefreshCw className="animate-spin text-sm" />
                   <span>Authenticating...</span>
                 </>
               ) : (
@@ -228,7 +220,7 @@ function LoginForm() {
           {/* Footer Link */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+               Don&apos;t have an account?{" "}
               <Link className="text-primary hover:underline font-semibold underline-offset-4" href="/register">
                 Sign Up
               </Link>

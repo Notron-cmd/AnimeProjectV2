@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Star, Search } from "lucide-react";
 import { getSeasonalAnime } from '@/lib/anilist';
+import type { AniListAnime } from "@/lib/types";
 
 const SEASONS = ['WINTER', 'SPRING', 'SUMMER', 'FALL'] as const;
 
@@ -18,13 +20,14 @@ export default function SeasonalPage() {
 
   const [season, setSeason] = useState(defaultSeason);
   const [year, setYear] = useState(now.getFullYear());
-  const [animeList, setAnimeList] = useState<any[]>([]);
+  const [animeList, setAnimeList] = useState<AniListAnime[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setPage(1);
     setAnimeList([]);
@@ -103,7 +106,7 @@ export default function SeasonalPage() {
       ) : animeList.length > 0 ? (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {animeList.map((anime: any) => (
+            {animeList.map((anime: AniListAnime) => (
               <Link key={anime.id} href={`/anime/${anime.id}`} className="group block">
                 <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-card border border-border/40 group-hover:ring-2 group-hover:ring-primary transition-all duration-300">
                   <Image
@@ -116,7 +119,7 @@ export default function SeasonalPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent flex flex-col justify-end p-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="flex items-center gap-1 mb-0.5">
-                      <span className="material-symbols-outlined text-amber-400 text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                      <Star className="text-amber-400 text-xs fill-amber-400" />
                       <span className="text-[10px] font-semibold text-foreground">{anime.averageScore ?? '--'}</span>
                     </div>
                     <span className="text-[9px] text-muted-foreground">{anime.format} • {anime.episodes ?? '?'} eps</span>
@@ -142,7 +145,7 @@ export default function SeasonalPage() {
         </>
       ) : (
         <div className="text-center py-16">
-          <span className="material-symbols-outlined text-4xl text-muted-foreground/30 mb-2">search</span>
+          <Search className="text-4xl text-muted-foreground/30 mb-2" />
           <p className="text-sm text-muted-foreground">No anime found for this season.</p>
         </div>
       )}

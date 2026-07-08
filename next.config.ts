@@ -2,12 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@prisma/client'],
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        port: '',
         pathname: '/**',
       },
       { 
@@ -29,17 +31,23 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'banner.anilist.co',
-        port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'i.ytimg.com',
-        port: '',
         pathname: '/**',
       },
     ],
   },
 };
 
-export default nextConfig;
+export default async function config() {
+  if (process.env.ANALYZE === 'true') {
+    const withBundleAnalyzer = (await import('@next/bundle-analyzer')).default({
+      enabled: true,
+    });
+    return withBundleAnalyzer(nextConfig);
+  }
+  return nextConfig;
+}

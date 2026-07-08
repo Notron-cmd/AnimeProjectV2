@@ -3,6 +3,7 @@
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Sparkles, Shield, Eye, User as UserIcon, Mail, Lock, UserPlus, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import { registerUser } from '../../actions/auth'; 
 
 export default function RegisterPage() {
@@ -89,12 +90,12 @@ export default function RegisterPage() {
           
           <div className="mt-10 grid grid-cols-2 gap-4">
             <div className="bg-surface-container/60 backdrop-blur-md border border-outline-variant p-4 rounded-xl">
-              <span className="material-symbols-outlined text-primary mb-2">auto_awesome</span>
+              <Sparkles className="text-primary mb-2" />
               <h3 className="font-semibold text-foreground text-sm mb-1">Neural Sync</h3>
               <p className="text-xs text-on-surface-variant">Your watchlist synchronized effortlessly.</p>
             </div>
             <div className="bg-surface-container/60 backdrop-blur-md border border-outline-variant p-4 rounded-xl">
-              <span className="material-symbols-outlined text-primary mb-2">security</span>
+              <Shield className="text-primary mb-2" />
               <h3 className="font-semibold text-foreground text-sm mb-1">Encrypted Node</h3>
               <p className="text-xs text-on-surface-variant">Secure session keys guard your global account.</p>
             </div>
@@ -110,9 +111,7 @@ export default function RegisterPage() {
           <div className="lg:hidden flex justify-center mb-8">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-on-primary-container" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  visibility
-                </span>
+                <Eye className="text-on-primary-container" />
               </div>
               <span className="text-xl font-bold text-primary tracking-tight">AniVision</span>
             </div>
@@ -132,7 +131,7 @@ export default function RegisterPage() {
           {/* Banner Pesan Error dari Database */}
           {errorMessage && (
             <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 animate-fadeIn">
-              <span className="material-symbols-outlined text-sm">error</span>
+              <AlertCircle className="text-sm" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -144,14 +143,11 @@ export default function RegisterPage() {
                 Full Name
               </label>
               <div className="relative group">
-                <span 
-                  className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                <UserIcon 
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                     focusedField === 'name' ? 'text-primary' : 'text-on-surface-variant/60'
                   }`}
-                  style={{ fontVariationSettings: focusedField === 'name' ? "'FILL' 1" : "'FILL' 0" }}
-                >
-                  person
-                </span>
+                />
                 <input 
                   className="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant rounded-xl text-base text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200" 
                   id="name" 
@@ -171,14 +167,11 @@ export default function RegisterPage() {
                 Email Address
               </label>
               <div className="relative group">
-                <span 
-                  className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                <Mail 
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                     focusedField === 'email' ? 'text-primary' : 'text-on-surface-variant/60'
                   }`}
-                  style={{ fontVariationSettings: focusedField === 'email' ? "'FILL' 1" : "'FILL' 0" }}
-                >
-                  alternate_email
-                </span>
+                />
                 <input 
                   className="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant rounded-xl text-base text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200" 
                   id="email" 
@@ -198,14 +191,11 @@ export default function RegisterPage() {
                 Password
               </label>
               <div className="relative group">
-                <span 
-                  className={`material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                <Lock 
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                     focusedField === 'password' ? 'text-primary' : 'text-on-surface-variant/60'
                   }`}
-                  style={{ fontVariationSettings: focusedField === 'password' ? "'FILL' 1" : "'FILL' 0" }}
-                >
-                  lock
-                </span>
+                />
                 <input 
                   className="w-full pl-12 pr-4 py-3 bg-surface-container-high border border-outline-variant rounded-xl text-base text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-200" 
                   id="password" 
@@ -232,18 +222,18 @@ export default function RegisterPage() {
               {submitStatus === 'idle' && (
                 <>
                   <span>Create Account</span>
-                  <span className="material-symbols-outlined">person_add</span>
+                  <UserPlus />
                 </>
               )}
               {submitStatus === 'submitting' && (
                 <>
-                  <span className="material-symbols-outlined animate-spin">sync</span>
+                  <RefreshCw className="animate-spin" />
                   <span>Creating Identity...</span>
                 </>
               )}
               {submitStatus === 'success' && (
                 <>
-                  <span className="material-symbols-outlined">check_circle</span>
+                  <CheckCircle />
                   <span>Identity Created</span>
                 </>
               )}

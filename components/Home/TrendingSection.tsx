@@ -3,8 +3,9 @@
 import React, { useRef } from 'react';
 import Link from 'next/link'; 
 import AnimeCard from './AnimeCard';
+import type { AniListAnime } from "@/lib/types";
 
-export default function TrendingSection({ animeData }: { animeData: any[] }) {
+export default function TrendingSection({ animeData }: { animeData: AniListAnime[] }) {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleScroll = (direction: 'left' | 'right') => {
@@ -63,12 +64,12 @@ export default function TrendingSection({ animeData }: { animeData: any[] }) {
         ref={carouselRef}
         className="flex gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 progress-wrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:none"
       >
-        {animeData.map((anime: any) => (
+        {animeData.map((anime: AniListAnime) => (
           <Link href={`/anime/${anime.id}`} key={anime.id} className="snap-start shrink-0">
             <AnimeCard
               title={anime.title.english || anime.title.romaji}
               rating={anime.averageScore ? (anime.averageScore / 10).toFixed(1) : "N/A"}
-              episode={anime.episodes || "Ongoing"}
+              episode={anime.episodes?.toString() || "Ongoing"}
               type={anime.format || "TV"}
               image={anime.coverImage.large || anime.coverImage.extraLarge}
             />

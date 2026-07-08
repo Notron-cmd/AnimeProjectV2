@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Star, Calendar } from "lucide-react";
 import { getScheduleAnime } from '@/lib/anilist';
+import type { AniListAnime } from "@/lib/types";
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -22,13 +24,14 @@ function formatTime(airingAt: number): string {
 export default function SchedulePage() {
   const today = DAYS[new Date().getDay()];
   const [activeDay, setActiveDay] = useState(today);
-  const [animeList, setAnimeList] = useState<any[]>([]);
+  const [animeList, setAnimeList] = useState<AniListAnime[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     (async () => {
       try {
@@ -64,7 +67,7 @@ export default function SchedulePage() {
   };
 
   const groupedByDay = useMemo(() => {
-    const groups: Record<string, any[]> = {};
+    const groups: Record<string, AniListAnime[]> = {};
     for (const day of DAYS) groups[day] = [];
     for (const anime of animeList) {
       const next = anime.nextAiringEpisode;
@@ -115,7 +118,7 @@ export default function SchedulePage() {
             <span className="text-[10px] text-muted-foreground/50">({activeAnime.length} anime)</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {activeAnime.map((anime: any) => {
+            {activeAnime.map((anime: AniListAnime) => {
               const next = anime.nextAiringEpisode;
               return (
                 <Link key={anime.id} href={`/anime/${anime.id}`} className="group block">
@@ -130,7 +133,7 @@ export default function SchedulePage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent flex flex-col justify-end p-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="flex items-center gap-1 mb-0.5">
-                        <span className="material-symbols-outlined text-amber-400 text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <Star className="text-amber-400 text-xs fill-amber-400" />
                         <span className="text-[10px] font-semibold text-foreground">{anime.averageScore ?? '--'}</span>
                       </div>
                       <span className="text-[9px] text-muted-foreground">{anime.format} • {anime.episodes ?? '?'} eps</span>
@@ -167,7 +170,7 @@ export default function SchedulePage() {
         </>
       ) : (
         <div className="text-center py-16">
-          <span className="material-symbols-outlined text-4xl text-muted-foreground/30 mb-2">calendar_month</span>
+          <Calendar className="text-4xl text-muted-foreground/30 mb-2" />
           <p className="text-sm text-muted-foreground">No anime scheduled for {activeDay}.</p>
         </div>
       )}

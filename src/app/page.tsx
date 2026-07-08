@@ -1,6 +1,9 @@
-import HeroSection from "@/components/Home/Hero";
+import React from 'react';
+import dynamic from "next/dynamic";
 import SearchSection from "@/components/Home/SearchSection";
-import TrendingSection from "@/components/Home/TrendingSection";
+
+const HeroSection = dynamic(() => import("@/components/Home/Hero"), { ssr: true });
+const TrendingSection = dynamic(() => import("@/components/Home/TrendingSection"), { ssr: true });
 import FeatureCards from "@/components/Home/FeatureCards";
 import QuickStats from "@/components/Home/QuickStats";
 import { getTrendingAnime, searchAnime } from "@/lib/anilist";
@@ -8,6 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/src/lib/auth";
 import Link from 'next/link';
 import AnimeCard from "@/components/Home/AnimeCard";
+import { ArrowLeft, Zap, Sparkles, Heart, Monitor, Compass, Smile, Clapperboard, AlertTriangle, Search, Leaf, Gamepad2, Moon } from "lucide-react";
+import type { AniListAnime } from "@/lib/types";
 
 interface PageProps {
   searchParams: Promise<{ q?: string; genre?: string }>;
@@ -54,7 +59,7 @@ export default async function Home({ searchParams }: PageProps) {
                 href="/"
                 className="flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors bg-[#1a1b23] border border-white/5 hover:border-white/20 rounded-lg px-3 py-2"
               >
-                <span className="material-symbols-outlined text-sm">arrow_back</span>
+                <ArrowLeft className="text-sm" />
                 Back to Home
               </Link>
             </div>
@@ -63,12 +68,12 @@ export default async function Home({ searchParams }: PageProps) {
               <p className="text-zinc-400 text-sm">Anime tidak ditemukan, coba filter atau kata kunci lain.</p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-                {searchResults.map((anime: any) => (
+                {searchResults.map((anime: AniListAnime) => (
                   <Link href={`/anime/${anime.id}`} key={anime.id}>
                     <AnimeCard
                       title={anime.title.english || anime.title.romaji}
                       rating={anime.averageScore ? (anime.averageScore / 10).toFixed(1) : "N/A"}
-                      episode={anime.episodes || "Ongoing"}
+                      episode={anime.episodes?.toString() || "Ongoing"}
                       type={anime.format || "TV"}
                       image={anime.coverImage.large || anime.coverImage.extraLarge}
                     />
@@ -88,8 +93,22 @@ export default async function Home({ searchParams }: PageProps) {
                 <span className="w-1.5 h-6 bg-emerald-400 rounded-full inline-block"></span>
                 Browse by Genre
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                {[
+              {(() => {
+                const genreIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+                  bolt: Zap,
+                  auto_awesome: Sparkles,
+                  favorite: Heart,
+                  devices: Monitor,
+                  explore: Compass,
+                  mood: Smile,
+                  theater_comedy: Clapperboard,
+                  dangerous: AlertTriangle,
+                  search: Search,
+                  spa: Leaf,
+                  sports_esports: Gamepad2,
+                  nights_stay: Moon,
+                };
+                const genres = [
                   { name: 'Action', icon: 'bolt', gradient: 'from-red-600/30 to-red-900/20' },
                   { name: 'Fantasy', icon: 'auto_awesome', gradient: 'from-purple-600/30 to-purple-900/20' },
                   { name: 'Romance', icon: 'favorite', gradient: 'from-pink-600/30 to-pink-900/20' },
@@ -102,17 +121,25 @@ export default async function Home({ searchParams }: PageProps) {
                   { name: 'Slice of Life', icon: 'spa', gradient: 'from-rose-600/30 to-rose-900/20' },
                   { name: 'Sports', icon: 'sports_esports', gradient: 'from-orange-600/30 to-orange-900/20' },
                   { name: 'Supernatural', icon: 'nights_stay', gradient: 'from-violet-600/30 to-violet-900/20' },
-                ].map((g) => (
-                  <Link
-                    key={g.name}
-                    href={`/?genre=${g.name}`}
-                    className={`bg-gradient-to-br ${g.gradient} border border-white/5 hover:border-white/20 rounded-xl p-4 flex flex-col items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 group`}
-                  >
-                    <span className="material-symbols-outlined text-2xl text-zinc-300 group-hover:text-white transition-colors">{g.icon}</span>
-                    <span className="text-sm font-semibold text-zinc-200 group-hover:text-white transition-colors">{g.name}</span>
-                  </Link>
-                ))}
-              </div>
+                ];
+                return (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                    {genres.map((g) => {
+                      const IconComp = genreIcons[g.icon] || Search;
+                      return (
+                        <Link
+                          key={g.name}
+                          href={`/?genre=${g.name}`}
+                          className={`bg-gradient-to-br ${g.gradient} border border-white/5 hover:border-white/20 rounded-xl p-4 flex flex-col items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 group`}
+                        >
+                          <IconComp className="text-2xl text-zinc-300 group-hover:text-white transition-colors" />
+                          <span className="text-sm font-semibold text-zinc-200 group-hover:text-white transition-colors">{g.name}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </section>
 
             <FeatureCards />

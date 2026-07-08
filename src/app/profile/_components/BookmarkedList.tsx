@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { BookmarkPlus, Trash2 } from "lucide-react";
 
 interface BookmarkItem {
   id: string;
@@ -58,7 +59,7 @@ export default function BookmarkedList({ bookmarks, onDelete, onMoveToLibrary }:
                     onMoveToLibrary(item.id);
                   }}
                 >
-                  <span className="material-symbols-outlined text-xl">library_add</span>
+                  <BookmarkPlus className="text-xl" />
                 </button>
 
                 {/* Tombol Hapus Bookmark */}
@@ -70,7 +71,7 @@ export default function BookmarkedList({ bookmarks, onDelete, onMoveToLibrary }:
                     onDelete(item.id);
                   }}
                 >
-                  <span className="material-symbols-outlined text-xl">delete</span>
+                  <Trash2 className="text-xl" />
                 </button>
               </div>
             </div>

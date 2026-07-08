@@ -10,7 +10,7 @@ interface AnimeCardProps {
       romaji: string;
     };
     averageScore?: number;
-    format: string;
+    format?: string;
     coverImage: {
       large: string;
       extraLarge: string;

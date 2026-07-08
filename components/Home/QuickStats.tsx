@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { PlayCircle, Users, Bookmark, Heart } from "lucide-react";
 
 function useCountUp(target: number, duration = 2000) {
   const [count, setCount] = useState(0);
@@ -17,7 +18,7 @@ function useCountUp(target: number, duration = 2000) {
         if (!entry.isIntersecting) return;
         observer.disconnect();
 
-        let start = performance.now();
+        const start = performance.now();
         function tick(now: number) {
           const elapsed = now - start;
           const progress = Math.min(elapsed / duration, 1);
@@ -36,11 +37,11 @@ function useCountUp(target: number, duration = 2000) {
   return { count, ref };
 }
 
-const iconStyles: Record<string, { color: string; bg: string }> = {
-  play_circle: { color: 'text-sky-300', bg: 'bg-sky-400/25' },
-  group: { color: 'text-purple-300', bg: 'bg-purple-400/25' },
-  bookmark: { color: 'text-emerald-300', bg: 'bg-emerald-400/25' },
-  favorite: { color: 'text-red-300', bg: 'bg-red-400/25' },
+const iconStyles: Record<string, { color: string; bg: string; icon: React.ComponentType<{ className?: string }> }> = {
+  play_circle: { color: 'text-sky-300', bg: 'bg-sky-400/25', icon: PlayCircle },
+  group: { color: 'text-purple-300', bg: 'bg-purple-400/25', icon: Users },
+  bookmark: { color: 'text-emerald-300', bg: 'bg-emerald-400/25', icon: Bookmark },
+  favorite: { color: 'text-red-300', bg: 'bg-red-400/25', icon: Heart },
 };
 
 function StatCard({ label, value, icon, gradient, displayZero }: { label: string; value: number; icon: string; gradient: string; displayZero?: boolean }) {
@@ -50,7 +51,7 @@ function StatCard({ label, value, icon, gradient, displayZero }: { label: string
     <div className={`relative group ${gradient} rounded-2xl p-[1px] overflow-hidden`}>
       <div className="bg-[#121317] rounded-2xl p-6 h-full flex flex-col items-center justify-center relative z-10">
         <div className={`w-12 h-12 rounded-xl ${s.bg} border border-white/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg`}>
-          <span className={`material-symbols-outlined ${s.color} text-2xl`} style={{ fontVariationSettings: "'FILL' 1" }}>{icon}</span>
+          <s.icon className={`${s.color} text-2xl`} />
         </div>
         <p ref={ref} className="text-3xl sm:text-4xl font-extrabold text-white tabular-nums leading-none tracking-tight">
           {displayZero && value === 0 ? '—' : count.toLocaleString()}

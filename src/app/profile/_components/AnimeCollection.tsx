@@ -2,7 +2,9 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
+import { Trophy, Plus, Lock, Crown, Trash2 } from "lucide-react";
 import { fetchWithCsrf } from '@/lib/csrf-client';
 
 interface AnimeData {
@@ -35,7 +37,7 @@ export default function AnimeCollection({ favorites, onRefresh }: AnimeCollectio
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>rewarded_ads</span>
+            <Trophy className="text-primary text-2xl" />
             Anime Collection
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -53,7 +55,7 @@ export default function AnimeCollection({ favorites, onRefresh }: AnimeCollectio
         {collection.length < 10 && (
           <div className="aspect-[2/3] rounded-2xl border-2 border-dashed border-border/60 flex flex-col items-center justify-center p-4 text-center group cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all duration-300">
             <div className="w-11 h-11 rounded-full bg-card border border-border flex items-center justify-center mb-2.5 text-muted-foreground group-hover:text-primary group-hover:border-primary/30 transition-colors">
-              <span className="material-symbols-outlined text-xl">add</span>
+              <Plus className="text-xl" />
             </div>
             <p className="font-semibold text-xs text-foreground/80 mb-0.5 group-hover:text-foreground">Slot #{collection.length + 1}</p>
             <p className="text-[10px] text-muted-foreground">Favorite more anime</p>
@@ -63,7 +65,7 @@ export default function AnimeCollection({ favorites, onRefresh }: AnimeCollectio
         {Array.from({ length: Math.max(0, 9 - collection.length) }).map((_, i) => (
           <div key={`locked-${i}`} className="aspect-[2/3] rounded-2xl border-2 border-dashed border-border/20 flex flex-col items-center justify-center p-4 text-center opacity-40 bg-card/10">
             <div className="w-11 h-11 rounded-full bg-card border border-border flex items-center justify-center mb-2.5 text-muted-foreground">
-              <span className="material-symbols-outlined text-xl">lock</span>
+              <Lock className="text-xl" />
             </div>
             <p className="font-semibold text-xs text-muted-foreground mb-0.5">Slot #{collection.length + 2 + i}</p>
             <p className="text-[9px] text-muted-foreground/60 italic">Elite Tier Required</p>
@@ -135,10 +137,13 @@ function TiltPosterCard({ favorite, rank, onRefresh }: { favorite: FavoriteItem;
         className="relative group aspect-[2/3] rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 shadow-md bg-card cursor-pointer"
       >
         {favorite.anime.imageUrl ? (
-          <img
+          <Image
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
             alt={favorite.anime.title}
             src={favorite.anime.imageUrl}
+            fill
+            sizes="(max-width: 640px) 50vw, 20vw"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#7c3aed]/20 to-[#4c1d95]/20">
@@ -150,7 +155,7 @@ function TiltPosterCard({ favorite, rank, onRefresh }: { favorite: FavoriteItem;
 
         <div className="absolute top-3 left-3 z-20">
           <div className="bg-background/80 backdrop-blur-md px-2.5 py-0.5 rounded-md border border-border flex items-center gap-1">
-            <span className="material-symbols-outlined text-primary text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>crown</span>
+            <Crown className="text-primary text-xs" />
             <span className="text-[10px] font-bold text-foreground">#{rank}</span>
           </div>
         </div>
@@ -175,7 +180,7 @@ function TiltPosterCard({ favorite, rank, onRefresh }: { favorite: FavoriteItem;
               onClick={handleRemoveFavorite}
               className="bg-red-500/80 text-white py-1.5 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-red-500 transition-all cursor-pointer"
             >
-              <span className="material-symbols-outlined text-sm">delete</span>
+              <Trash2 className="text-sm" />
             </button>
           </div>
         </div>

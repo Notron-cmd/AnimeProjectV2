@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getAnimeDetail, getGenreRecommendations } from '@/lib/anilist';
+import type { AniListAnime, AniListRecommended } from "@/lib/types";
 import AnimeBanner from '@/src/app/anime/[id]/_components/AnimeBanner';
 import AnimeSidebar from '@/src/app/anime/[id]/_components/AnimeSidebar';
 import AnimeContent from '@/src/app/anime/[id]/_components/AnimeContent';
@@ -57,12 +58,12 @@ export default async function AnimeDetailPage({ params }: PageProps) {
     
     // Mapping Karakter
     characters: [
-      ...(animeData.mainCharacters?.edges?.map((edge: any) => ({
+      ...(animeData.mainCharacters?.edges?.map((edge: { role: string; node: { name: { full: string }; image: { large: string } } }) => ({
         name: edge.node.name.full,
         role: edge.role,
         img: edge.node.image.large
       })) || []),
-      ...(animeData.supportingCharacters?.edges?.map((edge: any) => ({
+      ...(animeData.supportingCharacters?.edges?.map((edge: { role: string; node: { name: { full: string }; image: { large: string } } }) => ({
         name: edge.node.name.full,
         role: edge.role,
         img: edge.node.image.large
@@ -71,11 +72,11 @@ export default async function AnimeDetailPage({ params }: PageProps) {
 
     // Mapping Rekomendasi
     recommendations: animeData.recommendations?.nodes
-      ?.filter((node: any) => node.mediaRecommendation !== null)
-      ?.map((node: any) => ({
+      ?.filter((node): node is { mediaRecommendation: AniListRecommended } => node.mediaRecommendation != null)
+      ?.map((node) => ({
         id: node.mediaRecommendation.id.toString(),
         title: node.mediaRecommendation.title.english || node.mediaRecommendation.title.romaji,
-        img: node.mediaRecommendation.coverImage.large
+        img: node.mediaRecommendation.coverImage?.large || ""
       })) || [],
 
     // Genre-based recommendations
@@ -86,9 +87,9 @@ export default async function AnimeDetailPage({ params }: PageProps) {
   if (anime.genres.length > 0) {
     const genreData = await getGenreRecommendations(anime.genres.slice(0, 3));
     anime.genreRecommendations = (genreData || [])
-      .filter((m: any) => m.id.toString() !== id)
+      .filter((m: AniListAnime) => m.id.toString() !== id)
       .slice(0, 8)
-      .map((m: any) => ({
+      .map((m: AniListAnime) => ({
         id: m.id.toString(),
         title: m.title.english || m.title.romaji,
         img: m.coverImage.large || m.coverImage.extraLarge,

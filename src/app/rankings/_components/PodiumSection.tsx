@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
+import { Star, RefreshCw, Plus } from "lucide-react";
 import { fetchWithCsrf } from '@/lib/csrf-client';
+import type { AniListAnime } from "@/lib/types";
 
 interface PodiumSectionProps {
-  topThree: any[];
+  topThree: AniListAnime[];
 }
 
 export default function PodiumSection({ topThree }: PodiumSectionProps) {
@@ -26,7 +28,7 @@ export default function PodiumSection({ topThree }: PodiumSectionProps) {
   );
 }
 
-function PodiumCard({ rank, anime, customClass }: { rank: number; anime: any; customClass: string }) {
+function PodiumCard({ rank, anime, customClass }: { rank: number; anime: AniListAnime; customClass: string }) {
   const { toast } = useToast();
   const [adding, setAdding] = useState(false);
   if (!anime) return null;
@@ -75,7 +77,7 @@ function PodiumCard({ rank, anime, customClass }: { rank: number; anime: any; cu
         </div>
         <h3 className="text-xl font-semibold text-white mb-1 line-clamp-1">{title}</h3>
         <div className="flex items-center justify-center gap-1 mb-4">
-          <span className="material-symbols-outlined text-[18px] text-yellow-400" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+          <Star className="text-[18px] text-yellow-400 fill-yellow-400" />
           <span className={`text-lg font-medium ${isRank1 ? 'text-[#d2bbff] font-bold text-xl' : 'text-zinc-300'}`}>{score}</span>
         </div>
       </Link>
@@ -86,7 +88,7 @@ function PodiumCard({ rank, anime, customClass }: { rank: number; anime: any; cu
           isRank1 ? 'py-3 hover:shadow-lg hover:shadow-purple-500/20 brightness-105' : 'py-2.5'
         }`}
       >
-        <span className="material-symbols-outlined text-[16px]">{adding ? 'sync' : 'add'}</span>
+        {adding ? <RefreshCw className="text-[16px] animate-spin" /> : <Plus className="text-[16px]" />}
         {adding ? 'Adding...' : 'Add to Library'}
       </button>
     </div>

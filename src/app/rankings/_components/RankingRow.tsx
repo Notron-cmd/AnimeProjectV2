@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useToast } from '@/components/ui/toast';
+import { Star, User, RefreshCw, BookmarkPlus } from "lucide-react";
 import { fetchWithCsrf } from '@/lib/csrf-client';
+import type { AniListAnime } from "@/lib/types";
 
 interface RankingRowProps {
   rank: number;
-  anime: any;
+  anime: AniListAnime;
 }
 
 export default function RankingRow({ rank, anime }: RankingRowProps) {
@@ -65,12 +67,12 @@ export default function RankingRow({ rank, anime }: RankingRowProps) {
         </div>
       </Link>
       <div className="hidden md:flex col-span-2 justify-center items-center gap-1">
-        <span className="material-symbols-outlined text-[#7c3aed] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+        <Star className="text-[#7c3aed] text-[16px] fill-[#7c3aed]" />
         <span className="font-medium text-white">{score}</span>
       </div>
       <div className="hidden md:flex col-span-2 justify-center items-center gap-1">
-        <span className="material-symbols-outlined text-zinc-400 text-[16px]">person</span>
-        <span className="text-sm text-zinc-400">{formatUsers(anime.popularity)}</span>
+        <User className="text-zinc-400 text-[16px]" />
+        <span className="text-sm text-zinc-400">{formatUsers(anime.popularity ?? 0)}</span>
       </div>
       <div className="col-span-3 md:col-span-1 flex justify-end">
         <button
@@ -78,7 +80,7 @@ export default function RankingRow({ rank, anime }: RankingRowProps) {
           disabled={adding}
           className="p-2.5 rounded-full bg-[#7c3aed]/10 text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white transition-all active:scale-90 flex items-center justify-center"
         >
-          <span className="material-symbols-outlined text-sm">{adding ? 'sync' : 'library_add'}</span>
+          {adding ? <RefreshCw className="text-sm animate-spin" /> : <BookmarkPlus className="text-sm" />}
         </button>
       </div>
     </div>
